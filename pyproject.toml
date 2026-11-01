@@ -1,0 +1,27 @@
+[project]
+name = "project-management-api"
+version = "0.1.0"
+description = "API de gestion de proyectos"
+readme = "README.md"
+requires-python = ">=3.14"
+
+# Las dependencias estan en los archivos "requirements.txt" y "requirements-dev.txt"
+
+# Ubicacion del codigo fuente
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Configuraciones de ruff
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "Q", "SIM", "RUF", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
