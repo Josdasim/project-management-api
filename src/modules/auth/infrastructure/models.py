@@ -16,7 +16,7 @@ class Account(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "accounts"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("user.id", ondelete = "CASCADE"),
+        ForeignKey("users.id", ondelete = "CASCADE"),
         unique = True,
         nullable = False
     )
