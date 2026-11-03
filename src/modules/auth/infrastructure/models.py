@@ -47,6 +47,7 @@ class Account(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             ]
         ),
         default = AccountStatus.ACTIVE,
+        server_default = AccountStatus.ACTIVE.value,
         nullable = False
     )
 
