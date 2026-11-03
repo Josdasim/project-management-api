@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from src.api.router import api_router
+import src.core.models_registry
 
 app = FastAPI(
     title="Project Management API",
