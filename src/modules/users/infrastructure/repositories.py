@@ -1,0 +1,27 @@
+from sqlalchemy.orm import Session
+
+from src.modules.users.domain.entities import User
+from src.modules.users.infrastructure.models import User as UserModel
+
+def _to_entity(model: UserModel) -> User:
+    return User(
+        id = model.id,
+        first_name = model.first_name,
+        last_name = model.last_name,
+        created_at = model.created_at,
+        updated_at = model.updated_at
+    )
+
+class SqlAlchemyUserRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def add(self, user: User) -> User:
+        model = UserModel(
+            id = user.id,
+            first_name = user.first_name,
+            last_name = user.last_name
+        )
+        self._session.add(model)
+        self._session.flush()
+        return _to_entity(model)
