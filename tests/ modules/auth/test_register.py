@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy import func, select
 
 from src.modules.auth.infrastructure.models import Account as AccountModel
-from src.modules.auth.infrastructure.repositories import SqlAlchemyAccountRepository
+from src.modules.auth.infrastructure.repositories.account_repository import SqlAlchemyAccountRepository
 from src.modules.users.infrastructure.models import User as UserModel
 
 URL = "/api/v1/auth/register"
