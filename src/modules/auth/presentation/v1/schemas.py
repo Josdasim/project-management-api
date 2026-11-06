@@ -51,3 +51,14 @@ class RegisterResponse(BaseModel):
     last_name: str | None
     status: AccountStatus
     created_at: datetime
+
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra = "forbid")
+
+    identifier: str = Field(min_length = 1, max_length = EMAIL_MAX)
+    password: str = Field(min_length = 1, max_length = PASSWORD_MAX, repr = False)
+
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"

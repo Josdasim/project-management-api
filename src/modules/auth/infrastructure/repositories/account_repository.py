@@ -53,3 +53,13 @@ class SqlAlchemyAccountRepository:
                 raise EmailAlreadyExistsError from error
             raise
         return _to_entity(model)
+
+    def get_by_username(self, username: str) -> Account | None:
+        statament = select(AccountModel).where(AccountModel.username == username)
+        model = self._session.scalar(statament)
+        return _to_entity(model) if model else None
+
+    def get_by_email(self, email: str) -> Account | None:
+        statement = select(AccountModel).where(AccountModel.email == email)
+        model = self._session.scalar(statement)
+        return _to_entity(model) if model else None

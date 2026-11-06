@@ -3,11 +3,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.modules.auth.application.services.register_account import RegisterAccountService
+from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.domain.exceptions import (
-    EmailAlreadyExistsError, UsernameAlreadyExistsError
+    EmailAlreadyExistsError, UsernameAlreadyExistsError, InvalidCredentialsError
 )
-from src.modules.auth.presentation.dependencies import get_register_service
-from src.modules.auth.presentation.v1.schemas import RegisterRequest, RegisterResponse
+from src.modules.auth.presentation.dependencies import get_register_service, get_login_service
+from src.modules.auth.presentation.v1.schemas import (
+    RegisterRequest, RegisterResponse, LoginRequest, LoginResponse
+)
 
 
 router = APIRouter(prefix = "/auth", tags = ["auth"])
@@ -44,4 +47,22 @@ def register(
         last_name = result.user.last_name,
         status = result.account.status,
         created_at = result.account.created_at
+    )
+
+@router.post("/login", response_model = LoginResponse)
+def login(
+    payload: LoginRequest,
+    service: Annotated[LoginService, Depends(get_login_service)]
+) -> LoginResponse:
+    try:
+        result = service.login(identifier = payload.identifier, password = payload.password)
+    except InvalidCredentialsError:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            "Credenciales invalidas",
+            headers = {"WWW-Authenticate":"Bearer"}
+        ) from None
+
+    return LoginResponse(
+        access_token = result.access_token, refresh_token = result.refresh_token
     )
