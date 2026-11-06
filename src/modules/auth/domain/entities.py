@@ -14,3 +14,12 @@ class Account:
     status: AccountStatus = AccountStatus.ACTIVE
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+@dataclass
+class RefreshToken:
+    id: UUID
+    account_id: UUID
+    token_hash: str
+    expires_at: datetime
+    revoked_at: datetime | None = None
+    created_at: datetime | None = None
