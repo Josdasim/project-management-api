@@ -49,7 +49,7 @@ def get_login_service(db: Annotated[Session, Depends(get_db)]) -> LoginService:
 
 def get_authenticate_service(db: Annotated[Session, Depends(get_db)]) -> AuthenticateService:
     return AuthenticateService(
-        account = SqlAlchemyAccountRepository(db)
+        account = SqlAlchemyAccountRepository(db),
         token_provider = _token_provider()
     )
 
