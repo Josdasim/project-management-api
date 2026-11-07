@@ -8,8 +8,11 @@ from src.modules.users.application.services.get_profile import GetProfileService
 from src.modules.users.infrastructure.repositories.user_repository import (
     SqlAlchemyUserRepository
 )
+from src.modules.users.application.services.update_profile import UpdateProfileService
 
 
 def get_profile_service(db: Annotated[Session, Depends(get_db)]) -> GetProfileService:
     return GetProfileService(user = SqlAlchemyUserRepository(db))
 
+def get_update_profile_service(db: Annotated[Session, Depends(get_db)]) -> UpdateProfileService:
+    return UpdateProfileService(user = SqlAlchemyUserRepository(db), unit_work = db)
