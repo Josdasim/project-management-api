@@ -31,3 +31,10 @@ class SqlAlchemyUserRepository:
     def get_by_id(self, user_id: UUID) -> User | None:
         model = self._session.get(UserModel, user_id)
         return _to_entity(model) if User else None
+
+    def update(self, user: User) -> User:
+        model = self._session.get(UserModel, user.id)
+        model.first_name = user.first_name
+        model.last_name = user.last_name
+        self._session.flush()
+        return _to_entity(model)
