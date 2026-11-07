@@ -1,6 +1,6 @@
-from typing import Annotated, Self
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, StringConstraints, model_validator
+from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
 
 NAME_MAX = 100
 NameStr = Annotated[
@@ -19,9 +19,10 @@ class ProfileUpdateRequest(BaseModel):
     first_name: NameStr | None = None
     last_name: NameStr | None = None
 
-    @model_validator(mode = "after")
-    def first_name_cannot_be_null(self) -> Self:
-        if "fist_name" in self.model_fields_set and self.first_name is None:
+    @field_validator("first_name")
+    @classmethod
+    def first_name_cannot_be_null(cls, value: str | None) -> str | None:
+        if value is None:
             raise ValueError("El nombre no puede ser nulo")
 
-        return self
+        return value
