@@ -22,5 +22,5 @@ def get_update_profile_service(db: Annotated[Session, Depends(get_db)]) -> Updat
 def get_search_users_service(db: Annotated[Session, Depends(get_db)]) -> SearchUsersService:
     return SearchUsersService(
         account = SqlAlchemyAccountRepository(db),
-        user = SearchUsersService(db)
+        user = SqlAlchemyUserRepository(db)
     )
