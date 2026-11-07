@@ -9,7 +9,7 @@ from src.core.database import get_db
 from src.core.security import ArgonPasswordHasher
 from src.modules.auth.application.services.register_account import RegisterAccountService
 from src.modules.auth.infrastructure.repositories.account_repository import SqlAlchemyAccountRepository
-from src.modules.users.infrastructure.repositories import SqlAlchemyUserRepository
+from src.modules.users.public import SqlAlchemyUserRepository
 from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.infrastructure.repositories.refresh_token_repository import SqlAlchemyRefreshTokenRepository
 from src.modules.auth.infrastructure.token_provider import JwtTokenProvider
