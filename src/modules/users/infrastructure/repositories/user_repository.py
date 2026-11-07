@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from src.modules.users.domain.entities import User
@@ -25,3 +27,7 @@ class SqlAlchemyUserRepository:
         self._session.add(model)
         self._session.flush()
         return _to_entity(model)
+
+    def get_by_id(self, user_id: UUID) -> User | None:
+        model = self._session.get(UserModel, user_id)
+        return _to_entity(model) if User else None

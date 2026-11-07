@@ -42,14 +42,14 @@ def test_devolver_datos_cuenta_autenticada(client, access_token):
     assert body["email"] == "dana@correo.com"
     assert body["status"] == "active"
 
-#RF-AUTH-03-CA-01
+#RF-AUTH-03-CA-02
 def test_no_expone_datos_sensibles(client, access_token):
     body = client.get(ME_URL, headers = bearer(access_token)).json()
 
     assert set(body) == {"username", "email", "status", "created_at"}
 
 #RF-AUTH-03-CA-03
-def test_devuelve_datos_cuenta_autenticada(client, access_token):
+def test_devolver_solo_la_cuenta_del_token(client, access_token):
     other_account = {**USER, "username": "otro_username", "email": "otro@correo.com"}
 
     assert client.post(REGISTER_URL, json = other_account).status_code == 201
@@ -66,7 +66,7 @@ def test_rechazar_peticion_sin_token(client):
 def test_rechazar_token_invalido(client):
     assert client.get(ME_URL, headers = bearer("novalido")).status_code == 401
 
-#RNF-SEC-03-CA-01
+#RNF-SEC-02-CA-01
 def test_rechazar_token_vencido(client, access_token, db):
     account = db.scalar(select(AccountModel))
     expired = JwtTokenProvider(settings.jwt_secret_key, settings.jwt_algorithm, -1)

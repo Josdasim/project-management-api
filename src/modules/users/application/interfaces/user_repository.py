@@ -1,6 +1,8 @@
 from typing import Protocol
+from uuid import UUID
 
 from src.modules.users.domain.entities import User
 
 class UserRepository(Protocol):
     def add(self, user: User) -> User: ...
+    def get_by_id(self, user_id: UUID) -> User | None: ...
