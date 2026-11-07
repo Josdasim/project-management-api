@@ -7,10 +7,13 @@ from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.domain.exceptions import (
     EmailAlreadyExistsError, UsernameAlreadyExistsError, InvalidCredentialsError
 )
-from src.modules.auth.presentation.dependencies import get_register_service, get_login_service
-from src.modules.auth.presentation.v1.schemas import (
-    RegisterRequest, RegisterResponse, LoginRequest, LoginResponse
+from src.modules.auth.presentation.dependencies import (
+    get_register_service, get_login_service, get_current_account
 )
+from src.modules.auth.presentation.v1.schemas import (
+    RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AccountResponse
+)
+from src.modules.auth.domain.entities import Account
 
 
 router = APIRouter(prefix = "/auth", tags = ["auth"])
@@ -65,4 +68,15 @@ def login(
 
     return LoginResponse(
         access_token = result.access_token, refresh_token = result.refresh_token
+    )
+
+@router.get("/me", response_model = AccountResponse)
+def read_current_account(
+    account: Annotated[Account, Depends(get_current_account)]
+) -> AccountResponse:
+    return AccountResponse(
+        username = account.username,
+        email = account.email,
+        status = account.status,
+        created_at = account.created_at
     )

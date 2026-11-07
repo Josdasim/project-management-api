@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy import exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -62,4 +63,8 @@ class SqlAlchemyAccountRepository:
     def get_by_email(self, email: str) -> Account | None:
         statement = select(AccountModel).where(AccountModel.email == email)
         model = self._session.scalar(statement)
+        return _to_entity(model) if model else None
+
+    def get_by_id(self, account_id: UUID) -> Account | None:
+        model = self._session.get(AccountModel, account_id)
         return _to_entity(model) if model else None

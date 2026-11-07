@@ -62,3 +62,9 @@ class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+class AccountResponse(BaseModel):
+    username: str
+    email: str
+    status: AccountStatus
+    created_at: datetime
