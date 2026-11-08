@@ -4,14 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.modules.auth.application.services.register_account import RegisterAccountService
 from src.modules.auth.application.services.login import LoginService
+from src.modules.auth.application.services.refresh_session import RefreshSessionService
 from src.modules.auth.domain.exceptions import (
-    EmailAlreadyExistsError, UsernameAlreadyExistsError, InvalidCredentialsError
+    EmailAlreadyExistsError, UsernameAlreadyExistsError,
+    InvalidCredentialsError, InvalidTokenError
 )
 from src.modules.auth.presentation.dependencies import (
-    get_register_service, get_login_service, get_current_account
+    get_register_service, get_login_service, get_current_account, get_refresh_service
 )
 from src.modules.auth.presentation.v1.schemas import (
-    RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, AccountResponse
+    RegisterRequest, RegisterResponse, LoginRequest, 
+    LoginResponse, AccountResponse, RefreshRequest
 )
 from src.modules.auth.domain.entities import Account
 
@@ -80,3 +83,19 @@ def read_current_account(
         status = account.status,
         created_at = account.created_at
     )
+
+@router.post("/refresh", response_model=LoginResponse)
+def refresh(
+    payload: RefreshRequest,
+    service: Annotated[RefreshSessionService, Depends(get_refresh_service)]
+) -> LoginResponse:
+    try:
+        result = service.refresh(generated_refresh_token=payload.refresh_token)
+    except InvalidTokenError:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            "Token de renovacion invalido",
+            headers={"WWW-Authenticate": "Bearer"}
+        ) from None
+
+    return LoginResponse(access_token=result.access_token, refresh_token=result.refresh_token)

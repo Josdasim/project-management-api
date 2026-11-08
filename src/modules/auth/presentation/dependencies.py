@@ -16,6 +16,7 @@ from src.modules.auth.infrastructure.token_provider import JwtTokenProvider
 from src.modules.auth.application.services.authenticate import AuthenticateService
 from src.modules.auth.domain.entities import Account
 from src.modules.auth.domain.exceptions import InvalidTokenError
+from src.modules.auth.application.services.refresh_session import RefreshSessionService
 
 bearer_scheme = HTTPBearer(auto_error = False)
 
@@ -70,3 +71,16 @@ def get_current_account(
         return service.authenticate(credentials.credentials)
     except InvalidTokenError:
         raise unauthorized from None
+
+def get_refresh_service(db: Annotated[Session, Depends(get_db)]) -> RefreshSessionService:
+    return RefreshSessionService(
+        account=SqlAlchemyAccountRepository(db),
+        refresh_token=SqlAlchemyRefreshTokenRepository(db),
+        token_provider=JwtTokenProvider(
+            settings.jwt_secret_key,
+            settings.jwt_algorithm,
+            settings.access_token_expire_minutes
+        ),
+        unit_work=db,
+        refresh_token_expire_days=settings.refresh_token_expire_days
+    )
