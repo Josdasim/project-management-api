@@ -17,6 +17,7 @@ from src.modules.auth.application.services.authenticate import AuthenticateServi
 from src.modules.auth.domain.entities import Account
 from src.modules.auth.domain.exceptions import InvalidTokenError
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
+from src.modules.auth.application.services.logout import LogoutService
 
 bearer_scheme = HTTPBearer(auto_error = False)
 
@@ -83,4 +84,14 @@ def get_refresh_service(db: Annotated[Session, Depends(get_db)]) -> RefreshSessi
         ),
         unit_work=db,
         refresh_token_expire_days=settings.refresh_token_expire_days
+    )
+
+def get_logout_service(db: Annotated[Session, Depends(get_db)]) -> LogoutService:
+    return LogoutService(
+        refresh_token=SqlAlchemyRefreshTokenRepository(db),
+        token_provider=JwtTokenProvider(
+            settings.jwt_secret_key,
+            settings.jwt_algorithm,
+            settings.access_token_expire_minutes
+        ), unit_work=db
     )

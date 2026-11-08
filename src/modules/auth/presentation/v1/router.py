@@ -4,13 +4,15 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.modules.auth.application.services.register_account import RegisterAccountService
 from src.modules.auth.application.services.login import LoginService
+from src.modules.auth.application.services.logout import LogoutService
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
 from src.modules.auth.domain.exceptions import (
     EmailAlreadyExistsError, UsernameAlreadyExistsError,
     InvalidCredentialsError, InvalidTokenError
 )
 from src.modules.auth.presentation.dependencies import (
-    get_register_service, get_login_service, get_current_account, get_refresh_service
+    get_register_service, get_login_service, get_current_account, get_refresh_service,
+    get_logout_service
 )
 from src.modules.auth.presentation.v1.schemas import (
     RegisterRequest, RegisterResponse, LoginRequest, 
@@ -99,3 +101,10 @@ def refresh(
         ) from None
 
     return LoginResponse(access_token=result.access_token, refresh_token=result.refresh_token)
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(
+    payload: RefreshRequest,
+    service: Annotated[LogoutService, Depends(get_logout_service)]
+) -> None:
+    service.logout(genereted_refresh_token=payload.refresh_token)
