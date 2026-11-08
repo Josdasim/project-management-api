@@ -1,4 +1,7 @@
-from sqlalchemy import select
+from uuid import UUID
+from datetime import datetime
+
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from src.modules.auth.domain.entities import RefreshToken
@@ -39,3 +42,17 @@ class SqlAlchemyRefreshTokenRepository:
         model = self._session.scalar(statement)
 
         return _to_entity(model) if model else None
+
+    def update(self, token: RefreshToken) -> None:
+        model = self._session.get(RefreshTokenModel, token.id)
+        model.revoked_at = token.revoked_at
+        self._session.flush()
+
+    def revoke_all_for_account(self, account_id: UUID, revoked_at: datetime) -> None:
+        self._session.execute(
+            update(RefreshTokenModel).where(
+                RefreshTokenModel.account_id == account_id,
+                RefreshTokenModel.revoked_at.is_(None)
+            ).values(revoked_at = revoked_at)
+        )
+        self._session.flush()

@@ -15,10 +15,28 @@ where = ["src"]
 [tool.ruff]
 line-length = 100
 target-version = "py314"
+src = ["src","."]
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "B", "Q", "SIM", "RUF", "UP"]
+select = ["E", "F", "I", "N", "W", "B"]
 ignore = ["E501"]
+unfixable = ["F401"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+"**/models_registry.py" = ["F401"]
+"alembic/env.py" =["F401", "E402"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-inmutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+    "fastapi.Security",
+]
 
 [tool.ruff.format]
 quote-style = "double"
