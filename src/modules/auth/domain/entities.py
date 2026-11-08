@@ -4,6 +4,7 @@ from uuid import UUID
 
 from src.modules.auth.domain.enums import AccountStatus
 
+
 @dataclass
 class Account:
     id: UUID
@@ -14,6 +15,7 @@ class Account:
     status: AccountStatus = AccountStatus.ACTIVE
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
 
 @dataclass
 class RefreshToken:

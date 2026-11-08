@@ -2,10 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import (
-    BaseModel, ConfigDict, EmailStr,
-    Field, StringConstraints, field_validator
-)
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator
 
 from src.modules.auth.domain.enums import AccountStatus
 
@@ -16,23 +13,17 @@ NAME_MAX = 100
 
 NameStr = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=NAME_MAX)
-    ]
+]
 
 
 class RegisterRequest(BaseModel):
-    model_config = ConfigDict(extra = "forbid")
+    model_config = ConfigDict(extra="forbid")
 
     username: str = Field(
-        min_length = USERNAME_MIN,
-        max_length = USERNAME_MAX,
-        pattern = r"^[A-Za-z0-9_.-]+$"
+        min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=r"^[A-Za-z0-9_.-]+$"
     )
     email: EmailStr
-    password: str = Field(
-        min_length = PASSWORD_MIN,
-        max_length = PASSWORD_MAX,
-        repr = False
-    )
+    password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX, repr=False)
     first_name: NameStr
     last_name: NameStr | None = None
 
@@ -52,22 +43,26 @@ class RegisterResponse(BaseModel):
     status: AccountStatus
     created_at: datetime
 
-class LoginRequest(BaseModel):
-    model_config = ConfigDict(extra = "forbid")
 
-    identifier: str = Field(min_length = 1, max_length = EMAIL_MAX)
-    password: str = Field(min_length = 1, max_length = PASSWORD_MAX, repr = False)
+class LoginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    identifier: str = Field(min_length=1, max_length=EMAIL_MAX)
+    password: str = Field(min_length=1, max_length=PASSWORD_MAX, repr=False)
+
 
 class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
 
+
 class AccountResponse(BaseModel):
     username: str
     email: str
     status: AccountStatus
     created_at: datetime
+
 
 class RefreshRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")

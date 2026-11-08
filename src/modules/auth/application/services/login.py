@@ -12,7 +12,7 @@ from src.modules.auth.domain.enums import AccountStatus
 from src.modules.auth.domain.exceptions import InvalidCredentialsError
 
 
-@dataclass(frozen = True)
+@dataclass(frozen=True)
 class LoginResult:
     access_token: str
     refresh_token: str
@@ -20,12 +20,13 @@ class LoginResult:
 
 class LoginService:
     def __init__(
-            self, account: AccountRepository,
-            refresh_token: RefreshTokenRepository,
-            hasher: PasswordHasher,
-            token_provider: TokenProvider,
-            unit_work: UnitOfWork,
-            refresh_token_expire_days: int
+        self,
+        account: AccountRepository,
+        refresh_token: RefreshTokenRepository,
+        hasher: PasswordHasher,
+        token_provider: TokenProvider,
+        unit_work: UnitOfWork,
+        refresh_token_expire_days: int,
     ) -> None:
         self._account = account
         self._refresh_token = refresh_token
@@ -40,7 +41,7 @@ class LoginService:
         if "@" in identifier:
             account = self._account.get_by_email(identifier)
         else:
-            account = self._account.get_by_username(identifier) 
+            account = self._account.get_by_username(identifier)
 
         is_password_ok = self._hasher.verify(password, account.password_hash if account else None)
 
@@ -50,15 +51,15 @@ class LoginService:
         generated_refresh_token = self._token_provider.generate_refresh_token()
         self._refresh_token.add(
             RefreshToken(
-                id = uuid.uuid7(),
-                account_id = account.id,
-                token_hash = self._token_provider.hash_refresh_token(generated_refresh_token),
-                expires_at = datetime.now() + timedelta(days = self._refresh_days)
+                id=uuid.uuid7(),
+                account_id=account.id,
+                token_hash=self._token_provider.hash_refresh_token(generated_refresh_token),
+                expires_at=datetime.now() + timedelta(days=self._refresh_days),
             )
         )
         self._unit_work.commit()
 
         return LoginResult(
-            access_token = self._token_provider.create_access_token(account.id),
-            refresh_token = generated_refresh_token
+            access_token=self._token_provider.create_access_token(account.id),
+            refresh_token=generated_refresh_token,
         )

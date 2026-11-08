@@ -13,18 +13,10 @@ if TYPE_CHECKING:
 class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "users"
 
-    first_name: Mapped[str] = mapped_column(
-        String(100),
-        nullable = False
-    )
+    first_name: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    last_name: Mapped[str | None] =mapped_column(
-        String(100),
-        nullable = True
-    )
+    last_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     account: Mapped["Account | None"] = relationship(
-        back_populates = "user", 
-        cascade = "all, delete-orphan",
-        passive_deletes = True
+        back_populates="user", cascade="all, delete-orphan", passive_deletes=True
     )
