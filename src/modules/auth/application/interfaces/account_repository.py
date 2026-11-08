@@ -3,6 +3,7 @@ from uuid import UUID
 
 from src.modules.auth.domain.entities import Account
 
+
 class AccountRepository(Protocol):
     def username_exists(self, username: str) -> bool: ...
     def email_exists(self, email: str) -> bool: ...

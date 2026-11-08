@@ -16,17 +16,19 @@ def engine():
     if not url or url == settings.database_url or not url.endswith("_test"):
         pytest.exit(
             "La variable TEST_DATABASE_URL no apunta a una base de datos que termine en '_test'",
-            returncode = 2
+            returncode=2,
         )
-    test_engine = create_engine(url, pool_pre_ping = True)
+    test_engine = create_engine(url, pool_pre_ping=True)
     Base.metadata.drop_all(test_engine)
     Base.metadata.create_all(test_engine)
     yield test_engine
     test_engine.dispose()
 
+
 @pytest.fixture
 def session_factory(engine):
-    return sessionmaker(bind = engine, autoflush = False)
+    return sessionmaker(bind=engine, autoflush=False)
+
 
 @pytest.fixture
 def client(session_factory, engine):

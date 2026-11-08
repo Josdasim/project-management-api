@@ -51,7 +51,6 @@ class RefreshSessionService:
         if account is None or account.status != AccountStatus.ACTIVE:
             raise InvalidTokenError
 
-        
         stored.revoked_at = now
         self._refresh_token.update(stored)
 
@@ -67,4 +66,3 @@ class RefreshSessionService:
         access = self._token_provider.create_access_token(account.id)
         self._unit_work.commit()
         return RefreshResult(access_token=access, refresh_token=new_generated_token)
-

@@ -29,7 +29,7 @@ unfixable = ["F401"]
 "alembic/env.py" =["F401", "E402"]
 
 [tool.ruff.lint.flake8-bugbear]
-extend-inmutable-calls = [
+extend-immutable-calls = [
     "fastapi.Depends",
     "fastapi.Query",
     "fastapi.Path",

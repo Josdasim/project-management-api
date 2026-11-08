@@ -4,23 +4,22 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.modules.auth.domain.entities import Account
-from src.modules.auth.domain.exceptions import (
-    EmailAlreadyExistsError, UsernameAlreadyExistsError
-)
+from src.modules.auth.domain.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
 from src.modules.auth.infrastructure.models import Account as AccountModel
 
 
 def _to_entity(model: AccountModel) -> Account:
     return Account(
-        id = model.id,
-        user_id = model.user_id,
-        username = model.username,
-        email = model.email,
-        password_hash = model.password_hash,
-        status = model.status,
-        created_at = model.created_at,
-        updated_at = model.created_at
+        id=model.id,
+        user_id=model.user_id,
+        username=model.username,
+        email=model.email,
+        password_hash=model.password_hash,
+        status=model.status,
+        created_at=model.created_at,
+        updated_at=model.created_at,
     )
+
 
 class SqlAlchemyAccountRepository:
     def __init__(self, session: Session) -> None:
@@ -36,12 +35,12 @@ class SqlAlchemyAccountRepository:
 
     def add(self, account: Account) -> Account:
         model = AccountModel(
-            id = account.id,
-            user_id = account.user_id,
-            username = account.username,
-            email = account.email,
-            password_hash = account.password_hash,
-            status = account.status
+            id=account.id,
+            user_id=account.user_id,
+            username=account.username,
+            email=account.email,
+            password_hash=account.password_hash,
+            status=account.status,
         )
         self._session.add(model)
         try:

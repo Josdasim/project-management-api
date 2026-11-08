@@ -9,10 +9,7 @@ from src.modules.auth.domain.exceptions import InvalidTokenError
 
 
 class JwtTokenProvider:
-    def __init__(
-            self, secret_key: str, algorithm: str,
-            access_token_expire_minutes: int
-    ) -> None:
+    def __init__(self, secret_key: str, algorithm: str, access_token_expire_minutes: int) -> None:
         self._secret_key = secret_key
         self._algorithm = algorithm
         self._expire_minutes = access_token_expire_minutes
@@ -22,20 +19,18 @@ class JwtTokenProvider:
         payload = {
             "sub": str(account_id),
             "iat": now,
-            "exp": now + timedelta(minutes = self._expire_minutes)
+            "exp": now + timedelta(minutes=self._expire_minutes),
         }
 
-        return jwt.encode(payload, self._secret_key, algorithm = self._algorithm)
+        return jwt.encode(payload, self._secret_key, algorithm=self._algorithm)
 
     def decode_access_token(self, token: str) -> UUID:
         try:
             payload = jwt.decode(
                 token,
                 self._secret_key,
-                algorithms = [self._algorithm],
-                options = {
-                    "require": ["exp", "sub"]
-                }
+                algorithms=[self._algorithm],
+                options={"require": ["exp", "sub"]},
             )
 
             return UUID(payload["sub"])

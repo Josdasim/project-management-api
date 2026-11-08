@@ -16,5 +16,5 @@ class AuthenticateService:
 
         if account is None or account.status != AccountStatus.ACTIVE:
             raise InvalidTokenError
-        
+
         return account

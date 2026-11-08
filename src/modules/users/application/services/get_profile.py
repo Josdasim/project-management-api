@@ -14,5 +14,5 @@ class GetProfileService:
 
         if user is None:
             raise UserNotFoundError
-        
+
         return user
