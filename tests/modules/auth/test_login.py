@@ -9,7 +9,6 @@ from src.modules.auth.infrastructure.models import Account as AccountModel
 from src.modules.auth.infrastructure.models import RefreshToken as RefreshTokenModel
 from src.modules.auth.infrastructure.token_provider import JwtTokenProvider
 
-
 REGISTER_URL = "/api/v1/auth/register"
 LOGIN_URL = "/api/v1/auth/login"
 USER = {

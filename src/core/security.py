@@ -1,7 +1,6 @@
 from argon2 import PasswordHasher as _Argon2
 from argon2.exceptions import InvalidHashError, VerificationError
 
-
 _DUMMY_HASH = _Argon2().hash("password-de-relleno-brominha")
 
 

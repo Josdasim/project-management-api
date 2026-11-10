@@ -1,8 +1,9 @@
 from enum import StrEnum
 
+
 class ProjectStatus(StrEnum):
     ACTIVE = "active"
-    COMPLETED = "completado"
+    COMPLETED = "completed"
 
 class ProjectRole(StrEnum):
     OWNER = "owner"

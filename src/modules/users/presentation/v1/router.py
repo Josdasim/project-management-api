@@ -4,19 +4,19 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from src.modules.auth.public import Account, get_current_account
 from src.modules.users.application.services.get_profile import GetProfileService
-from src.modules.users.application.services.update_profile import UpdateProfileService
 from src.modules.users.application.services.search_users import SearchUsersService
+from src.modules.users.application.services.update_profile import UpdateProfileService
+from src.modules.users.domain.exceptions import UserNotFoundError
 from src.modules.users.presentation.dependencies import (
     get_profile_service,
-    get_update_profile_service,
     get_search_users_service,
+    get_update_profile_service,
 )
 from src.modules.users.presentation.v1.schemas import (
     ProfileResponse,
     ProfileUpdateRequest,
     UserSearchParams,
 )
-from src.modules.users.domain.exceptions import UserNotFoundError
 
 router = APIRouter(prefix="/users", tags=["users"])
 

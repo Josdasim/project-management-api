@@ -2,33 +2,32 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.modules.auth.application.services.register_account import RegisterAccountService
 from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.application.services.logout import LogoutService
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
+from src.modules.auth.application.services.register_account import RegisterAccountService
+from src.modules.auth.domain.entities import Account
 from src.modules.auth.domain.exceptions import (
     EmailAlreadyExistsError,
-    UsernameAlreadyExistsError,
     InvalidCredentialsError,
     InvalidTokenError,
+    UsernameAlreadyExistsError,
 )
 from src.modules.auth.presentation.dependencies import (
-    get_register_service,
-    get_login_service,
     get_current_account,
-    get_refresh_service,
+    get_login_service,
     get_logout_service,
+    get_refresh_service,
+    get_register_service,
 )
 from src.modules.auth.presentation.v1.schemas import (
-    RegisterRequest,
-    RegisterResponse,
+    AccountResponse,
     LoginRequest,
     LoginResponse,
-    AccountResponse,
     RefreshRequest,
+    RegisterRequest,
+    RegisterResponse,
 )
-from src.modules.auth.domain.entities import Account
-
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

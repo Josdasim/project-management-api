@@ -1,5 +1,5 @@
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
 
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session

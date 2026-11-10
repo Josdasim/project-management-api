@@ -7,21 +7,21 @@ from sqlalchemy.orm import Session
 from src.core.config import settings
 from src.core.database import get_db
 from src.core.security import ArgonPasswordHasher
+from src.modules.auth.application.services.authenticate import AuthenticateService
+from src.modules.auth.application.services.login import LoginService
+from src.modules.auth.application.services.logout import LogoutService
+from src.modules.auth.application.services.refresh_session import RefreshSessionService
 from src.modules.auth.application.services.register_account import RegisterAccountService
+from src.modules.auth.domain.entities import Account
+from src.modules.auth.domain.exceptions import InvalidTokenError
 from src.modules.auth.infrastructure.repositories.account_repository import (
     SqlAlchemyAccountRepository,
 )
-from src.modules.users.public import SqlAlchemyUserRepository
-from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.infrastructure.repositories.refresh_token_repository import (
     SqlAlchemyRefreshTokenRepository,
 )
 from src.modules.auth.infrastructure.token_provider import JwtTokenProvider
-from src.modules.auth.application.services.authenticate import AuthenticateService
-from src.modules.auth.domain.entities import Account
-from src.modules.auth.domain.exceptions import InvalidTokenError
-from src.modules.auth.application.services.refresh_session import RefreshSessionService
-from src.modules.auth.application.services.logout import LogoutService
+from src.modules.users.public import SqlAlchemyUserRepository
 
 bearer_scheme = HTTPBearer(auto_error=False)
 

@@ -1,5 +1,5 @@
-from typing import Protocol
 from datetime import datetime
+from typing import Protocol
 from uuid import UUID
 
 from src.modules.auth.domain.entities import RefreshToken
