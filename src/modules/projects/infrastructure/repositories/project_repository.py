@@ -4,9 +4,10 @@ from sqlalchemy import exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from src.modules.projects.domain.entities import Project
+from src.modules.projects.domain.entities import Project, ProjectWithRole
 from src.modules.projects.domain.exceptions import ProjectNameAlreadyExistsError
 from src.modules.projects.infrastructure.models import Project as ProjectModel
+from src.modules.projects.infrastructure.models import ProjectMember as ProjectMemberModel
 
 
 def _to_entity(model: ProjectModel) -> Project:
@@ -51,3 +52,35 @@ class SqlAlchemyProjectRepository:
                 raise ProjectNameAlreadyExistsError from error
             raise
         return _to_entity(model)
+
+    def _member_projects_statement(self, user_id: UUID, search: str | None):
+        statement = (
+            select(ProjectModel, ProjectMemberModel.role)
+            .join(ProjectMemberModel, ProjectMemberModel.project_id == ProjectModel.id)
+            .where(
+                ProjectMemberModel.user_id == user_id,
+                ProjectMemberModel.left_at.is_(None),
+                ProjectModel.deleted_at.is_(None),
+            )
+        )
+        if search:
+            statement = statement.where(ProjectModel.name.icontains(search, autoescape=True))
+        return statement
+
+    def list_by_member(
+        self, user_id: UUID, *, search: str | None, limit: int, offset: int
+    ) -> list[ProjectWithRole]:
+        statement = (
+            self._member_projects_statement(user_id, search)
+            .order_by(ProjectModel.created_at.desc(), ProjectModel.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        rows = self._session.execute(statement).all()
+
+        return [ProjectWithRole(project=_to_entity(project), role=role) for project, role in rows]
+
+    def count_by_member(self, user_id: UUID, *, search: str | None) -> int:
+        subquery = self._member_projects_statement(user_id, search).subquery()
+
+        return self._session.scalar(select(func.count()).select_from(subquery)) or 0

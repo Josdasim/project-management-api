@@ -26,3 +26,9 @@ class ProjectMember:
     joined_at: datetime
     left_at: datetime | None = None
     updated_at: datetime | None = None
+
+
+@dataclass
+class ProjectWithRole:
+    project: Project
+    role: ProjectRole
