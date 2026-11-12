@@ -1,9 +1,14 @@
 from typing import Protocol
 from uuid import UUID
 
-from src.modules.projects.domain.entities import Project
+from src.modules.projects.domain.entities import Project, ProjectWithRole
+
 
 
 class ProjectRepository(Protocol):
     def name_exists(self, owner_id: UUID, name: str) -> bool: ...
     def add(self, project: Project) -> Project: ...
+    def list_by_member(
+            self, user_id: UUID, *, search: str | None, limit: int, offset: int
+    ) -> list[ProjectWithRole]: ...
+    def count_by_member(self, user_id: UUID, *, search: str | None) -> int: ...
