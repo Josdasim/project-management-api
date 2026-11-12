@@ -18,8 +18,9 @@ def _to_entity(model: ProjectModel) -> Project:
         status=model.status,
         deleted_at=model.deleted_at,
         created_at=model.created_at,
-        updated_at=model.updated_at
+        updated_at=model.updated_at,
     )
+
 
 class SqlAlchemyProjectRepository:
     def __init__(self, session: Session) -> None:
@@ -28,18 +29,17 @@ class SqlAlchemyProjectRepository:
     def name_exists(self, owner_id: UUID, name: str) -> bool:
         statement = select(
             exists().where(
-                ProjectModel.owner_id == owner_id,
-                func.lower(ProjectModel.name) == name.lower()
+                ProjectModel.owner_id == owner_id, func.lower(ProjectModel.name) == name.lower()
             )
         )
 
     def add(self, project: Project) -> Project:
         model = ProjectModel(
-            id= project.id,
-            owner_id = project.owner_id,
-            name = project.name,
-            description= project.description,
-            status = project.status
+            id=project.id,
+            owner_id=project.owner_id,
+            name=project.name,
+            description=project.description,
+            status=project.status,
         )
         self._session.add(model)
         try:

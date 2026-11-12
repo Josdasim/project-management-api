@@ -4,22 +4,18 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
-from src.modules.projects.application.services.create_project import (
-    CreateProjectService
+from src.modules.projects.application.services.create_project import CreateProjectService
+from src.modules.projects.infrastructure.repositories.project_member_repository import (
+    SqlAlchemyProjectMemberRepository,
 )
 from src.modules.projects.infrastructure.repositories.project_repository import (
-    SqlAlchemyProjectRepository
-)
-from src.modules.projects.infrastructure.repositories.project_member_repository import (
-    SqlAlchemyProjectMemberRepository
+    SqlAlchemyProjectRepository,
 )
 
 
-def get_create_project_service(
-    db: Annotated[Session, Depends(get_db)]
-) -> CreateProjectService:
+def get_create_project_service(db: Annotated[Session, Depends(get_db)]) -> CreateProjectService:
     return CreateProjectService(
-        project = SqlAlchemyProjectRepository(db),
+        project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
-        unit_work=db
+        unit_work=db,
     )

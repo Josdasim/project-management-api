@@ -12,9 +12,7 @@ DESCRIPTION_MAX = 5000
 ProjectNameStr = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=NAME_MAX)
 ]
-DescriptionStr = Annotated[
-    str, StringConstraints(max_length=DESCRIPTION_MAX)
-]
+DescriptionStr = Annotated[str, StringConstraints(max_length=DESCRIPTION_MAX)]
 
 
 class CreateProjectRequest(BaseModel):
@@ -22,6 +20,7 @@ class CreateProjectRequest(BaseModel):
 
     name: ProjectNameStr
     description: DescriptionStr | None = None
+
 
 class ProjectResponse(BaseModel):
     id: UUID

@@ -16,6 +16,7 @@ class Project:
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
+
 @dataclass
 class ProjectMember:
     id: UUID

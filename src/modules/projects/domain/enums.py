@@ -5,6 +5,7 @@ class ProjectStatus(StrEnum):
     ACTIVE = "active"
     COMPLETED = "completed"
 
+
 class ProjectRole(StrEnum):
     OWNER = "owner"
     ADMIN = "admin"
