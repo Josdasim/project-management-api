@@ -12,9 +12,9 @@ class Project:
     name: str
     description: str | None = None
     status: ProjectStatus = ProjectStatus.ACTIVE
-    deleted_at: datetime | None
-    created_at: datetime
-    updated_at: datetime
+    deleted_at: datetime | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 @dataclass
 class ProjectMember:
@@ -24,4 +24,4 @@ class ProjectMember:
     role: ProjectRole
     joined_at: datetime
     left_at: datetime | None = None
-    updated_at: datetime
+    updated_at: datetime | None = None
