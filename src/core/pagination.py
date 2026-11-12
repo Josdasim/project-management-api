@@ -16,7 +16,7 @@ class PaginationParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     page: Annotated[int, Field(ge=1)] = 1
-    page_size: Annotated[int, Field(ge=1, le=100)] = 100
+    page_size: Annotated[int, Field(ge=1, le=100)] = 20
 
 
 class PageResponse[T](BaseModel):
