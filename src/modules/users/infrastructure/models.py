@@ -4,7 +4,7 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.database import Base
-from src.core.model_mixins import UUIDPrimaryKeyMixin, TimestampMixin
+from src.core.model_mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from src.modules.auth.infrastructure.models import Account

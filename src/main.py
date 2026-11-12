@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.core.config import settings
-from src.api.v1.router import api_router
 import src.core.models_registry
+from src.api.v1.router import api_router
+from src.core.config import settings
 from src.core.exceptions import register_exception_handlers
 
 app = FastAPI(
@@ -12,10 +12,7 @@ app = FastAPI(
     version="0.1.0",
 )
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins,
-    allow_methods=["*"],
-    allow_headers=["*"]
+    CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"], allow_headers=["*"]
 )
 register_exception_handlers(app)
 

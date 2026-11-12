@@ -1,4 +1,5 @@
 from uuid import UUID
+
 from sqlalchemy import exists, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session

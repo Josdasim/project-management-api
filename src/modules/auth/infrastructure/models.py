@@ -1,14 +1,13 @@
 import uuid
-from typing import TYPE_CHECKING
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import String, ForeignKey, Enum, DateTime, func
+from sqlalchemy import DateTime, Enum, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.database import Base
-from src.core.model_mixins import UUIDPrimaryKeyMixin, TimestampMixin
+from src.core.model_mixins import TimestampMixin, UUIDPrimaryKeyMixin
 from src.modules.auth.domain.enums import AccountStatus
-
 
 if TYPE_CHECKING:
     from src.modules.users.infrastructure.models import User

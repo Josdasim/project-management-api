@@ -3,9 +3,9 @@ from typing import Annotated, Self
 from pydantic import (
     BaseModel,
     ConfigDict,
+    Field,
     StringConstraints,
     field_validator,
-    Field,
     model_validator,
 )
 
