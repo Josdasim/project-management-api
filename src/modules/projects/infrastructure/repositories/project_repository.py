@@ -84,3 +84,15 @@ class SqlAlchemyProjectRepository:
         subquery = self._member_projects_statement(user_id, search).subquery()
 
         return self._session.scalar(select(func.count()).select_from(subquery)) or 0
+
+    def get_by_id_and_member(self, project_id: UUID, user_id: UUID) -> ProjectWithRole | None:
+        statement = self._member_projects_statement(user_id, None).where(
+            ProjectModel.id == project_id
+        )
+        row = self._session.execute(statement).first()
+
+        if row is None:
+            return None
+        project, role = row
+
+        return ProjectWithRole(project=_to_entity(project), role=role)
