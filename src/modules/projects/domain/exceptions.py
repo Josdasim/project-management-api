@@ -4,3 +4,7 @@ class ProjectsError(Exception):
 
 class ProjectNameAlreadyExistsError(ProjectsError):
     """El propietario ya tiene un proyecto con ese nombre"""
+
+
+class ProjectNotFoundError(ProjectsError):
+    """El proyecto no existe o la persona no tiene acceso a el"""
