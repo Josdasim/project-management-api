@@ -35,3 +35,6 @@ class ProjectListParams(PaginationParams):
 
 class ProjectListItem(ProjectResponse):
     role: ProjectRole
+
+class ProjectDetailResponse(ProjectResponse):
+    role: ProjectRole
