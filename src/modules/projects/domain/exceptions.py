@@ -8,3 +8,7 @@ class ProjectNameAlreadyExistsError(ProjectsError):
 
 class ProjectNotFoundError(ProjectsError):
     """El proyecto no existe o la persona no tiene acceso a el"""
+
+
+class ProjectPermissionDeniedError(ProjectsError):
+    """El rol del usuario en el proyecto no permite esta accion"""

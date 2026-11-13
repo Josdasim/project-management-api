@@ -27,12 +27,16 @@ class SqlAlchemyProjectRepository:
     def __init__(self, session: Session) -> None:
         self._session = session
 
-    def name_exists(self, owner_id: UUID, name: str) -> bool:
-        statement = select(
-            exists().where(
-                ProjectModel.owner_id == owner_id, func.lower(ProjectModel.name) == name.lower()
-            )
-        )
+    def name_exists(
+            self, owner_id: UUID, name: str, exclude_project_id: UUID | None = None
+        ) -> bool:
+        conditions = [
+            ProjectModel.owner_id == owner_id, 
+            func.lower(ProjectModel.name) == name.lower()
+        ]
+        if exclude_project_id is not None:
+            conditions.append(ProjectModel.id != exclude_project_id)
+        return bool(self._session.scalar(select(exists().where(*conditions))))
 
     def add(self, project: Project) -> Project:
         model = ProjectModel(
@@ -78,7 +82,9 @@ class SqlAlchemyProjectRepository:
         )
         rows = self._session.execute(statement).all()
 
-        return [ProjectWithRole(project=_to_entity(project), role=role) for project, role in rows]
+        return [
+            ProjectWithRole(project=_to_entity(project), role=role) for project, role in rows
+        ]
 
     def count_by_member(self, user_id: UUID, *, search: str | None) -> int:
         subquery = self._member_projects_statement(user_id, search).subquery()
@@ -96,3 +102,19 @@ class SqlAlchemyProjectRepository:
         project, role = row
 
         return ProjectWithRole(project=_to_entity(project), role=role)
+
+    def update(self, project: Project) -> Project:
+        model = self._session.get(ProjectModel, project.id)
+        model.name = project.name
+        model.description = project.description
+
+        try:
+            self._session.flush()
+        except IntegrityError as error:
+            constraint = getattr(error.orig.diag, "constraint_name", None) or ""
+
+            if "lower_name" in constraint:
+                raise ProjectNameAlreadyExistsError from error
+            raise
+        return _to_entity(model)
+    
