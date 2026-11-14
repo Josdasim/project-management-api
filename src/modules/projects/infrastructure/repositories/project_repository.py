@@ -28,11 +28,11 @@ class SqlAlchemyProjectRepository:
         self._session = session
 
     def name_exists(
-            self, owner_id: UUID, name: str, exclude_project_id: UUID | None = None
-        ) -> bool:
+        self, owner_id: UUID, name: str, exclude_project_id: UUID | None = None
+    ) -> bool:
         conditions = [
-            ProjectModel.owner_id == owner_id, 
-            func.lower(ProjectModel.name) == name.lower()
+            ProjectModel.owner_id == owner_id,
+            func.lower(ProjectModel.name) == name.lower(),
         ]
         if exclude_project_id is not None:
             conditions.append(ProjectModel.id != exclude_project_id)
@@ -82,9 +82,7 @@ class SqlAlchemyProjectRepository:
         )
         rows = self._session.execute(statement).all()
 
-        return [
-            ProjectWithRole(project=_to_entity(project), role=role) for project, role in rows
-        ]
+        return [ProjectWithRole(project=_to_entity(project), role=role) for project, role in rows]
 
     def count_by_member(self, user_id: UUID, *, search: str | None) -> int:
         subquery = self._member_projects_statement(user_id, search).subquery()
@@ -117,4 +115,3 @@ class SqlAlchemyProjectRepository:
                 raise ProjectNameAlreadyExistsError from error
             raise
         return _to_entity(model)
-    

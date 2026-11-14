@@ -6,8 +6,8 @@ from src.modules.projects.domain.entities import Project, ProjectWithRole
 
 class ProjectRepository(Protocol):
     def name_exists(
-                self, owner_id: UUID, name: str, exclude_project_id: UUID | None = None
-        ) -> bool: ...
+        self, owner_id: UUID, name: str, exclude_project_id: UUID | None = None
+    ) -> bool: ...
     def add(self, project: Project) -> Project: ...
     def list_by_member(
         self, user_id: UUID, *, search: str | None, limit: int, offset: int

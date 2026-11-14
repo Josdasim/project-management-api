@@ -7,7 +7,7 @@ from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.domain.exceptions import (
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
-    ProjectPermissionDeniedError
+    ProjectPermissionDeniedError,
 )
 
 
@@ -17,10 +17,7 @@ class UpdateProjectService:
         self._unit_work = unit_wort
 
     def update(
-        self, *,
-        project_id: UUID,
-        user_id: UUID,
-        changes: dict[str, str | None]
+        self, *, project_id: UUID, user_id: UUID, changes: dict[str, str | None]
     ) -> ProjectWithRole:
         found = self._project.get_by_id_and_member(project_id, user_id)
 
@@ -44,5 +41,5 @@ class UpdateProjectService:
             project.description = changes["description"]
         updated = self._project.update(project)
         self._unit_work.commit()
-        
+
         return ProjectWithRole(project=updated, role=found.role)
