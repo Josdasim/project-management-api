@@ -7,6 +7,7 @@ from src.core.database import get_db
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
+from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
@@ -29,3 +30,7 @@ def get_list_projects_service(db: Annotated[Session, Depends(get_db)]) -> ListPr
 
 def get_project_service(db: Annotated[Session, Depends(get_db)]) -> GetProjectService:
     return GetProjectService(project=SqlAlchemyProjectRepository(db))
+
+
+def get_update_project_service(db: Annotated[Session, Depends(get_db)]) -> UpdateProjectService:
+    return UpdateProjectService(project=SqlAlchemyProjectRepository(db), unit_wort=db)

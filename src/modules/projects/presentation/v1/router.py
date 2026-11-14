@@ -8,14 +8,17 @@ from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
+
 from src.modules.projects.domain.exceptions import (
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
+    ProjectPermissionDeniedError
 )
 from src.modules.projects.presentation.dependencies import (
     get_create_project_service,
     get_list_projects_service,
     get_project_service,
+    get_update_project_service
 )
 from src.modules.projects.presentation.v1.schemas import (
     CreateProjectRequest,
@@ -23,6 +26,7 @@ from src.modules.projects.presentation.v1.schemas import (
     ProjectListItem,
     ProjectListParams,
     ProjectResponse,
+    UpdateProjectRequest
 )
 
 router = APIRouter(prefix="/projects", tags=["projects"])
@@ -32,7 +36,7 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 def create_project(
     payload: CreateProjectRequest,
     account: Annotated[Account, Depends(get_current_account)],
-    service: Annotated[CreateProjectRequest, Depends(get_create_project_service)],
+    service: Annotated[CreateProjectService, Depends(get_create_project_service)],
 ) -> ProjectResponse:
     try:
         project = service.create(
@@ -98,4 +102,44 @@ def read_project(
         status=found.project.status,
         created_at=found.project.created_at,
         role=found.role,
+    )
+
+
+@router.patch("/{project_id}", response_model=ProjectDetailResponse)
+def update_project(
+    project_id: UUID,
+    payload: UpdateProjectRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[UpdateProjectRequest, Depends(get_update_project_service)]
+) -> ProjectDetailResponse:
+    
+    try:
+        updated = service.update(
+            project_id=project_id,
+            user_id=account.user_id,
+            changes=payload.model_dump(exclude_unset=True)
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "Proyecto no encontrado"
+        ) from None
+    except ProjectPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            "No tienes permiso para modificar este proyecto"
+        ) from None
+    except ProjectNameAlreadyExistsError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Ya existe un proyecto con ese nombre"
+        ) from None
+    
+    return ProjectDetailResponse(
+        id=updated.project.id,
+        name=updated.project.name,
+        description=updated.project.description,
+        status=updated.project.status,
+        created_at=updated.project.created_at,
+        role=updated.role
     )
