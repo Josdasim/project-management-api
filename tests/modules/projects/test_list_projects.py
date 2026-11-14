@@ -7,35 +7,7 @@ from src.modules.auth.infrastructure.models import Account as AccountModel
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.infrastructure.models import Project as ProjectModel
 from src.modules.projects.infrastructure.models import ProjectMember as ProjectMemberModel
-
-REGISTER_URL = "/api/v1/auth/register"
-LOGIN_URL = "/api/v1/auth/login"
-PROJECTS_URL = "/api/v1/projects"
-USER = {
-    "username": "dana_01",
-    "email": "dana@correo.com",
-    "password": "passdedana01",
-    "first_name": "Dana",
-}
-OTHER_USER = {**USER, "username": "otro_username", "email": "otro@correo.com"}
-
-
-def bearer(token):
-    return {"Authorization": f"Bearer {token}"}
-
-
-def login_token(client, username):
-    response = client.post(LOGIN_URL, json={"identifier": username, "password": USER["password"]})
-
-    assert response.status_code == 200
-    return response.json()["access_token"]
-
-
-def create(client, token, **data):
-    response = client.post(PROJECTS_URL, json=data, headers=bearer(token))
-
-    assert response.status_code == 201
-    return response
+from tests.modules.projects.conftest import PROJECTS_URL, access_token, bearer, create, other_token
 
 
 def list_projects(client, token, **params):
@@ -59,18 +31,6 @@ def add_member(db, project_name, username, role, left_at=None):
         )
     )
     db.commit()
-
-
-@pytest.fixture
-def access_token(client):
-    assert client.post(REGISTER_URL, json=USER).status_code == 201
-    return login_token(client, "dana_01")
-
-
-@pytest.fixture
-def other_token(client):
-    assert client.post(REGISTER_URL, json=OTHER_USER).status_code == 201
-    return login_token(client, "otro_username")
 
 
 # RF-PROJ-02-CA-01
