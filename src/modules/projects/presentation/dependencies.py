@@ -8,6 +8,7 @@ from src.modules.projects.application.services.create_project import CreateProje
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
+from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
@@ -34,3 +35,7 @@ def get_project_service(db: Annotated[Session, Depends(get_db)]) -> GetProjectSe
 
 def get_update_project_service(db: Annotated[Session, Depends(get_db)]) -> UpdateProjectService:
     return UpdateProjectService(project=SqlAlchemyProjectRepository(db), unit_wort=db)
+
+
+def get_delete_project_service(db: Annotated[Session, Depends(get_db)]) -> DeleteProjectService:
+    return DeleteProjectService(project=SqlAlchemyProjectRepository(db), unit_work=db)
