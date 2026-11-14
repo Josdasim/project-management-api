@@ -40,10 +40,9 @@ class UpdateProjectService:
                 raise ProjectNameAlreadyExistsError
             project.name = name
 
-            if "description" in changes:
-                project.description = changes["description"]
-
-            updated = self._project.update(project)
-            self._unit_work.commit()
-            
-            return ProjectWithRole(project=updated, role=found.role)
+        if "description" in changes:
+            project.description = changes["description"]
+        updated = self._project.update(project)
+        self._unit_work.commit()
+        
+        return ProjectWithRole(project=updated, role=found.role)

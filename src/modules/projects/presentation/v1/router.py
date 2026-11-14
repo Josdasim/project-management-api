@@ -8,6 +8,7 @@ from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
+from src.modules.projects.application.services.update_project import UpdateProjectService
 
 from src.modules.projects.domain.exceptions import (
     ProjectNameAlreadyExistsError,
