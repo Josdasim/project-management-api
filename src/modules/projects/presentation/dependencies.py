@@ -5,10 +5,10 @@ from sqlalchemy.orm import Session
 
 from src.core.database import get_db
 from src.modules.projects.application.services.create_project import CreateProjectService
+from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
-from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )

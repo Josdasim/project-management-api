@@ -105,6 +105,7 @@ class SqlAlchemyProjectRepository:
         model = self._session.get(ProjectModel, project.id)
         model.name = project.name
         model.description = project.description
+        model.deleted_at = project.deleted_at
 
         try:
             self._session.flush()

@@ -1,11 +1,12 @@
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from uuid import UUID
 
 from src.core.unit_of_work import UnitOfWork
 from src.modules.projects.application.interfaces.project_repository import ProjectRepository
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.domain.exceptions import (
-    ProjectNotFoundError, ProjectPermissionDeniedError
+    ProjectNotFoundError,
+    ProjectPermissionDeniedError,
 )
 
 

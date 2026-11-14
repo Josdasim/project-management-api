@@ -6,10 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from src.core.pagination import PageResponse, PaginationParams
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.create_project import CreateProjectService
+from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
-from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.domain.exceptions import (
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
@@ -17,10 +17,10 @@ from src.modules.projects.domain.exceptions import (
 )
 from src.modules.projects.presentation.dependencies import (
     get_create_project_service,
+    get_delete_project_service,
     get_list_projects_service,
     get_project_service,
     get_update_project_service,
-    get_delete_project_service
 )
 from src.modules.projects.presentation.v1.schemas import (
     CreateProjectRequest,
@@ -142,17 +142,17 @@ def update_project(
     )
 
 
-@router.delete('/{project_id}', status_code=204)
+@router.delete("/{project_id}", status_code=204)
 def delete_project(
-    project_id: UUID, 
+    project_id: UUID,
     account: Annotated[Account, Depends(get_current_account)],
-    service = Annotated[DeleteProjectService, Depends(get_delete_project_service)]
+    service: Annotated[DeleteProjectService, Depends(get_delete_project_service)],
 ) -> None:
     try:
-        service.delete(prohect_id=project_id, user_id=account.user_id)
+        service.delete(project_id=project_id, user_id=account.user_id)
     except ProjectNotFoundError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
     except ProjectPermissionDeniedError:
         raise HTTPException(
-                    status.HTTP_403_FORBIDDEN, "No tienes permiso para modificar este proyecto"
-                ) from None
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para modificar este proyecto"
+        ) from None
