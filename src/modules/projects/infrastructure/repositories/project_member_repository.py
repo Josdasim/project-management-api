@@ -1,3 +1,6 @@
+from uuid import UUID
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.modules.projects.domain.entities import ProjectMember
@@ -31,4 +34,22 @@ class SqlAlchemyProjectMemberRepository:
         )
         self._session.add(model)
         self._session.flush()
+        return _to_entity(model)
+
+    def get_by_project_and_user(self, project_id: UUID, user_id: UUID) -> ProjectMember | None:
+        model = self._session.scalar(
+            select(ProjectMemberModel).where(
+                ProjectMemberModel.project_id == project_id, ProjectMemberModel.user_id == user_id
+            )
+        )
+
+        return _to_entity(model) if model else None
+
+    def update(self, member: ProjectMember) -> ProjectMember:
+        model = self._session.get(ProjectMemberModel, member.id)
+        model.role = member.role
+        model.joined_at = member.joined_at
+        model.left_at = member.left_at
+        self._session.flush()
+
         return _to_entity(model)

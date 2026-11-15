@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from uuid import UUID
 
 from src.core.unit_of_work import UnitOfWork
-from src.modules.projects.application.interfaces.projec_member_repository import (
+from src.modules.projects.application.interfaces.project_member_repository import (
     ProjectMemberRepository,
 )
 from src.modules.projects.application.interfaces.project_repository import ProjectRepository

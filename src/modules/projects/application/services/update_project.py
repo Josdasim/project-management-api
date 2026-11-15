@@ -12,9 +12,9 @@ from src.modules.projects.domain.exceptions import (
 
 
 class UpdateProjectService:
-    def __init__(self, project: ProjectRepository, unit_wort: UnitOfWork) -> None:
+    def __init__(self, project: ProjectRepository, unit_work: UnitOfWork) -> None:
         self._project = project
-        self._unit_work = unit_wort
+        self._unit_work = unit_work
 
     def update(
         self, *, project_id: UUID, user_id: UUID, changes: dict[str, str | None]
