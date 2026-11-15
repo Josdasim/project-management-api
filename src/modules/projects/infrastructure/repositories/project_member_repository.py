@@ -39,8 +39,7 @@ class SqlAlchemyProjectMemberRepository:
     def get_by_project_and_user(self, project_id: UUID, user_id: UUID) -> ProjectMember | None:
         model = self._session.scalar(
             select(ProjectMemberModel).where(
-                ProjectMemberModel.project_id == project_id,
-                ProjectMemberModel.user_id == user_id
+                ProjectMemberModel.project_id == project_id, ProjectMemberModel.user_id == user_id
             )
         )
 

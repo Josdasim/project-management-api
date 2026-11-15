@@ -38,7 +38,7 @@ from src.modules.projects.presentation.v1.member_schemas import (
     MemberResponse, AddMemberRequest
 )
 
-router = APIRouter(prefix="/project/{project_id}/members")
+router = APIRouter(prefix="/projects/{project_id}/members")
 
 @router.post("", status_code=201)
 def add_member(

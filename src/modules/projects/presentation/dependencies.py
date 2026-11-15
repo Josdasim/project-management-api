@@ -4,21 +4,19 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from src.core.database import get_db
+from src.modules.auth.public import SqlAlchemyAccountRepository
+from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
-
-from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
 from src.modules.projects.infrastructure.repositories.project_repository import (
     SqlAlchemyProjectRepository,
 )
-
-from src.modules.auth.public import SqlAlchemyAccountRepository
 
 
 def get_create_project_service(db: Annotated[Session, Depends(get_db)]) -> CreateProjectService:
@@ -50,5 +48,5 @@ def get_add_member_service(db: Annotated[Session, Depends(get_db)]) -> AddMember
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
-        unit_work=db
+        unit_work=db,
     )
