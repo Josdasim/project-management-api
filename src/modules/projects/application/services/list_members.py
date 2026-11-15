@@ -51,8 +51,6 @@ class ListMembersService:
             account = accounts.get(member.user_id)
             user = users.get(member.user_id)
 
-            if account is None or user is None:
-                continue
             items.append(
                 MemberProfile(
                     username=account.username,
