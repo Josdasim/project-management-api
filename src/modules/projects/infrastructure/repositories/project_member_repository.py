@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.modules.projects.domain.entities import ProjectMember
+from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.infrastructure.models import ProjectMember as ProjectMemberModel
 
 
@@ -53,3 +54,17 @@ class SqlAlchemyProjectMemberRepository:
         self._session.flush()
 
         return _to_entity(model)
+
+    def list_active_by_projects(
+            self, project_id: UUID, *, role: ProjectRole | None = None
+    ) -> list[ProjectMember]:
+        statement = select(ProjectMemberModel).where(
+            ProjectMemberModel.project_id == project_id,
+            ProjectMemberModel.left_at.is_(None)
+        )
+
+        if role is not None:
+            statement = statement.where(ProjectMemberModel.role == role)
+
+        statement = statement.order_by(ProjectMemberModel.joined_at, ProjectMemberModel.id)
+        return [_to_entity(model) for model in self._session.scalars(statement)]
