@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.modules.users.domain.entities import User
@@ -28,7 +29,7 @@ class SqlAlchemyUserRepository:
 
     def get_by_id(self, user_id: UUID) -> User | None:
         model = self._session.get(UserModel, user_id)
-        return _to_entity(model) if User else None
+        return _to_entity(model) if model else None
 
     def update(self, user: User) -> User:
         model = self._session.get(UserModel, user.id)
@@ -36,3 +37,7 @@ class SqlAlchemyUserRepository:
         model.last_name = user.last_name
         self._session.flush()
         return _to_entity(model)
+
+    def list_by_ids(self, user_ids: list[UUID]) -> list[User]:
+        statement = select(UserModel).where(UserModel.id.in_(user_ids))
+        return [_to_entity(model) for model in self._session.scalars(statement)]

@@ -9,6 +9,7 @@ from src.modules.projects.application.services.add_member import AddMemberServic
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
+from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
@@ -17,6 +18,7 @@ from src.modules.projects.infrastructure.repositories.project_member_repository 
 from src.modules.projects.infrastructure.repositories.project_repository import (
     SqlAlchemyProjectRepository,
 )
+from src.modules.users.public import SqlAlchemyUserRepository
 
 
 def get_create_project_service(db: Annotated[Session, Depends(get_db)]) -> CreateProjectService:
@@ -49,4 +51,13 @@ def get_add_member_service(db: Annotated[Session, Depends(get_db)]) -> AddMember
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
         unit_work=db,
+    )
+
+
+def get_list_members_service(db: Annotated[Session, Depends(get_db)]) -> ListMembersService:
+    return ListMembersService(
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+        user=SqlAlchemyUserRepository(db),
     )

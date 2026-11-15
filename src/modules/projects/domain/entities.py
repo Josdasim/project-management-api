@@ -32,3 +32,12 @@ class ProjectMember:
 class ProjectWithRole:
     project: Project
     role: ProjectRole
+
+
+@dataclass
+class MemberProfile:
+    username: str
+    first_name: str
+    last_name: str | None
+    role: ProjectRole
+    joined_at: datetime
