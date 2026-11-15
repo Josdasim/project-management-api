@@ -18,7 +18,7 @@ def _to_entity(model: AccountModel) -> Account:
         password_hash=model.password_hash,
         status=model.status,
         created_at=model.created_at,
-        updated_at=model.created_at,
+        updated_at=model.updated_at,
     )
 
 
@@ -56,8 +56,8 @@ class SqlAlchemyAccountRepository:
         return _to_entity(model)
 
     def get_by_username(self, username: str) -> Account | None:
-        statament = select(AccountModel).where(AccountModel.username == username)
-        model = self._session.scalar(statament)
+        statement = select(AccountModel).where(AccountModel.username == username)
+        model = self._session.scalar(statement)
         return _to_entity(model) if model else None
 
     def get_by_email(self, email: str) -> Account | None:
@@ -68,3 +68,7 @@ class SqlAlchemyAccountRepository:
     def get_by_id(self, account_id: UUID) -> Account | None:
         model = self._session.get(AccountModel, account_id)
         return _to_entity(model) if model else None
+
+    def list_by_user_ids(self, user_ids: list[UUID]) -> list[Account]:
+        statement = select(AccountModel.where(AccountModel.user_id.in_(user_ids)))
+        return [_to_entity(model) for model in self._session.scalars(statement)]
