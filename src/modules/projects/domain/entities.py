@@ -33,6 +33,7 @@ class ProjectWithRole:
     project: Project
     role: ProjectRole
 
+
 @dataclass
 class MemberProfile:
     username: str

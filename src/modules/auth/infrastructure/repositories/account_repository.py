@@ -70,5 +70,5 @@ class SqlAlchemyAccountRepository:
         return _to_entity(model) if model else None
 
     def list_by_user_ids(self, user_ids: list[UUID]) -> list[Account]:
-        statement = select(AccountModel.where(AccountModel.user_id.in_(user_ids)))
+        statement = select(AccountModel).where(AccountModel.user_id.in_(user_ids))
         return [_to_entity(model) for model in self._session.scalars(statement)]

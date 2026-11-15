@@ -40,4 +40,4 @@ class SqlAlchemyUserRepository:
 
     def list_by_ids(self, user_ids: list[UUID]) -> list[User]:
         statement = select(UserModel).where(UserModel.id.in_(user_ids))
-        return [_to_entity(model) for model in self._session.scalar(statement)]
+        return [_to_entity(model) for model in self._session.scalars(statement)]

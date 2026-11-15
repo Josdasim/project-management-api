@@ -55,12 +55,11 @@ class SqlAlchemyProjectMemberRepository:
 
         return _to_entity(model)
 
-    def list_active_by_projects(
-            self, project_id: UUID, *, role: ProjectRole | None = None
+    def list_active_by_project(
+        self, project_id: UUID, *, role: ProjectRole | None = None
     ) -> list[ProjectMember]:
         statement = select(ProjectMemberModel).where(
-            ProjectMemberModel.project_id == project_id,
-            ProjectMemberModel.left_at.is_(None)
+            ProjectMemberModel.project_id == project_id, ProjectMemberModel.left_at.is_(None)
         )
 
         if role is not None:

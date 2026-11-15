@@ -4,8 +4,8 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, StringConstraints, field_validator
 
 from src.core.pagination import PaginationParams
-from src.modules.projects.presentation.v1.schemas import SearchStr
 from src.modules.projects.domain.entities import ProjectRole
+from src.modules.projects.presentation.v1.schemas import SearchStr
 
 UsernameStr = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3)]
 

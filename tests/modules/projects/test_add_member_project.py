@@ -217,4 +217,3 @@ def test_rechazar_peticion_sin_token(client, access_token):
     )
 
     assert response.status_code == 401
-
