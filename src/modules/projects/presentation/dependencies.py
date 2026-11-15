@@ -9,12 +9,16 @@ from src.modules.projects.application.services.delete_project import DeleteProje
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
+
+from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
 from src.modules.projects.infrastructure.repositories.project_repository import (
     SqlAlchemyProjectRepository,
 )
+
+from src.modules.auth.public import SqlAlchemyAccountRepository
 
 
 def get_create_project_service(db: Annotated[Session, Depends(get_db)]) -> CreateProjectService:
@@ -34,8 +38,17 @@ def get_project_service(db: Annotated[Session, Depends(get_db)]) -> GetProjectSe
 
 
 def get_update_project_service(db: Annotated[Session, Depends(get_db)]) -> UpdateProjectService:
-    return UpdateProjectService(project=SqlAlchemyProjectRepository(db), unit_wort=db)
+    return UpdateProjectService(project=SqlAlchemyProjectRepository(db), unit_work=db)
 
 
 def get_delete_project_service(db: Annotated[Session, Depends(get_db)]) -> DeleteProjectService:
     return DeleteProjectService(project=SqlAlchemyProjectRepository(db), unit_work=db)
+
+
+def get_add_member_service(db: Annotated[Session, Depends(get_db)]) -> AddMemberService:
+    return AddMemberService(
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+        unit_work=db
+    )

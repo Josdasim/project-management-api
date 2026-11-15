@@ -12,3 +12,11 @@ class ProjectNotFoundError(ProjectsError):
 
 class ProjectPermissionDeniedError(ProjectsError):
     """El rol del usuario en el proyecto no permite esta accion"""
+
+
+class MemberUserNotFoundError(ProjectsError):
+    pass
+
+
+class MemberAlreadyExistsError(ProjectsError):
+    pass
