@@ -20,3 +20,7 @@ class MemberUserNotFoundError(ProjectsError):
 
 class MemberAlreadyExistsError(ProjectsError):
     pass
+
+
+class MemberNotFoundError(ProjectsError):
+    pass
