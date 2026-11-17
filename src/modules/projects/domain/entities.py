@@ -41,3 +41,10 @@ class MemberProfile:
     last_name: str | None
     role: ProjectRole
     joined_at: datetime
+
+
+@dataclass
+class MemberWithRole:
+    member: ProjectMember
+    username: str
+

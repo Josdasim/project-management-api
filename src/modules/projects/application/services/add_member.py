@@ -8,7 +8,7 @@ from src.modules.projects.application.interfaces.project_member_repository impor
     ProjectMemberRepository,
 )
 from src.modules.projects.application.interfaces.project_repository import ProjectRepository
-from src.modules.projects.domain.entities import ProjectMember
+from src.modules.projects.domain.entities import ProjectMember, MemberWithRole
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,
@@ -16,12 +16,6 @@ from src.modules.projects.domain.exceptions import (
     ProjectNotFoundError,
     ProjectPermissionDeniedError,
 )
-
-
-@dataclass
-class AddedMember:
-    member: ProjectMember
-    username: str
 
 
 class AddMemberService:
@@ -39,7 +33,7 @@ class AddMemberService:
 
     def add(
         self, *, project_id: UUID, actor_id: UUID, username: str, role: ProjectRole
-    ) -> AddedMember:
+    ) -> MemberWithRole:
         actor = self._project.get_by_id_and_member(project_id, actor_id)
 
         if actor is None:
@@ -74,4 +68,4 @@ class AddMemberService:
             member = self._member.update(existing)
 
         self._unit_work.commit()
-        return AddedMember(member=member, username=account.username)
+        return MemberWithRole(member=member, username=account.username)

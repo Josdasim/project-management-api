@@ -105,7 +105,7 @@ def change_member_role(
     service: Annotated[ChangeMemberRoleService, Depends(get_change_member_role_service)],
 ) -> MemberResponse:
     try:
-        member = service.change_role(
+        result = service.change_role(
             project_id=project_id,
             actor_id=account.user_id,
             username=username,
@@ -120,7 +120,7 @@ def change_member_role(
             status.HTTP_403_FORBIDDEN, "No tienes permiso para cambiar el rol de este miembro"
         ) from None
 
-    return MemberResponse(username=username, role=member.role, joined_at=member.joined_at)
+    return MemberResponse(username=result.username, role=result.member.role, joined_at=result.member.joined_at)
 
 
 @router.delete("/{username}", status_code=204)
