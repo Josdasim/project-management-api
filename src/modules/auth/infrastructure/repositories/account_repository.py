@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exists, select
+from sqlalchemy import exists, select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -56,7 +56,7 @@ class SqlAlchemyAccountRepository:
         return _to_entity(model)
 
     def get_by_username(self, username: str) -> Account | None:
-        statement = select(AccountModel).where(AccountModel.username == username)
+        statement = select(AccountModel).where(AccountModel.username == username.lower())
         model = self._session.scalar(statement)
         return _to_entity(model) if model else None
 

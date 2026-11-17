@@ -8,6 +8,7 @@ from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
 from src.modules.projects.application.services.list_members import ListMembersService
+from src.modules.projects.application.services.remove_member import RemoveMemberService
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,
     MemberNotFoundError,
@@ -20,6 +21,7 @@ from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
     get_change_member_role_service,
     get_list_members_service,
+    get_remove_member_service
 )
 from src.modules.projects.presentation.v1.member_schemas import (
     AddMemberRequest,
@@ -29,7 +31,7 @@ from src.modules.projects.presentation.v1.member_schemas import (
     MemberResponse,
 )
 
-router = APIRouter(prefix="/projects/{project_id}/members")
+router = APIRouter(prefix="/projects/{project_id}/members", tags=["members"])
 
 
 @router.post("", status_code=201)
@@ -119,3 +121,22 @@ def change_member_role(
         ) from None
 
     return MemberResponse(username=username, role=member.role, joined_at=member.joined_at)
+
+
+@router.delete("/{username}", status_code=204)
+def remove_member(
+    project_id: UUID,
+    username: str,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[RemoveMemberService, Depends(get_remove_member_service)],
+) -> None:
+    try:
+        service.remove(project_id=project_id, actor_id=account.user_id, username=username)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except MemberNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Miembro no encontrado") from None
+    except ProjectPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para retirar a este miembro"
+        ) from None
