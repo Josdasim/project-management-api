@@ -3,12 +3,12 @@ from datetime import UTC, datetime
 import pytest
 from sqlalchemy import select
 
-from src.modules.auth.infrastructure.models import Account as AccountModel
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.infrastructure.models import Project as ProjectModel
-from src.modules.projects.infrastructure.models import ProjectMember as ProjectMemberModel
-from tests.modules.projects.conftest import PROJECTS_URL, access_token, bearer, create, other_token
-
+from tests.modules.projects.conftest import (
+    PROJECTS_URL, access_token, bearer, create, other_token,
+    add_member
+)
 
 def list_projects(client, token, **params):
     return client.get(PROJECTS_URL, params=params, headers=bearer(token))
@@ -16,21 +16,6 @@ def list_projects(client, token, **params):
 
 def names(response):
     return {item["name"] for item in response.json()["items"]}
-
-
-def add_member(db, project_name, username, role, left_at=None):
-    project = db.scalar(select(ProjectModel).where(ProjectModel.name == project_name))
-    account = db.scalar(select(AccountModel).where(AccountModel.username == username))
-    db.add(
-        ProjectMemberModel(
-            project_id=project.id,
-            user_id=account.user_id,
-            role=role,
-            joined_at=datetime.now(UTC),
-            left_at=left_at,
-        )
-    )
-    db.commit()
 
 
 # RF-PROJ-02-CA-01

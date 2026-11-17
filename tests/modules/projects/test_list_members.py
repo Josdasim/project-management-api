@@ -13,9 +13,10 @@ from tests.modules.projects.conftest import (
     USER,
     access_token,
     bearer,
-    create,
     login_token,
     other_token,
+    add_member,
+    project
 )
 
 USERS_ME_URL = "/api/v1/users/me"
@@ -23,21 +24,6 @@ USERS_ME_URL = "/api/v1/users/me"
 
 def members(client, token, project_id, **params):
     return client.get(f"{PROJECTS_URL}/{project_id}/members", params=params, headers=bearer(token))
-
-
-def add_member(db, project_name, username, role, left_at=None):
-    project = db.scalar(select(ProjectModel).where(ProjectModel.name == project_name))
-    account = db.scalar(select(AccountModel).where(AccountModel.username == username))
-    db.add(
-        ProjectMemberModel(
-            project_id=project.id,
-            user_id=account.user_id,
-            role=role,
-            joined_at=datetime.now(UTC),
-            left_at=left_at,
-        )
-    )
-    db.commit()
 
 
 @pytest.fixture
@@ -53,11 +39,6 @@ def third_token(client):
     response = client.patch(USERS_ME_URL, json={"last_name": "Rojas"}, headers=bearer(token))
     assert response.status_code == 200
     return token
-
-
-@pytest.fixture
-def project(client, access_token):
-    return create(client, access_token, name="Mi Proyecto")
 
 
 # RF-MEM-02-CA-01
