@@ -41,3 +41,15 @@ class MemberListItem(BaseModel):
     last_name: str | None
     role: ProjectRole
     joined_at: datetime
+
+class ChangeMemberRoleRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    role: ProjectRole
+
+    @field_validator("role")
+    @classmethod
+    def reject_owner(cls, value: ProjectRole) -> ProjectRole:
+        if value == ProjectRole.OWNER:
+            raise ValueError("No se puede asignar el rol de Propietario")
+        return value

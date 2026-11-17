@@ -12,6 +12,7 @@ from src.modules.projects.application.services.get_project import GetProjectServ
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.update_project import UpdateProjectService
+from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
@@ -60,4 +61,16 @@ def get_list_members_service(db: Annotated[Session, Depends(get_db)]) -> ListMem
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
         user=SqlAlchemyUserRepository(db),
+    )
+
+
+
+def get_change_member_role_service(
+    db: Annotated[Session, Depends(get_db)],
+) -> ChangeMemberRoleService:
+    return ChangeMemberRoleService(
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+        unit_work=db,
     )

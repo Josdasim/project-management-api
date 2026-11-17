@@ -7,22 +7,26 @@ from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.application.services.list_members import ListMembersService
+from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,
     MemberUserNotFoundError,
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
     ProjectPermissionDeniedError,
+    MemberNotFoundError
 )
 from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
     get_list_members_service,
+    get_change_member_role_service
 )
 from src.modules.projects.presentation.v1.member_schemas import (
     AddMemberRequest,
     MemberListItem,
     MemberListParams,
     MemberResponse,
+    ChangeMemberRoleRequest
 )
 
 router = APIRouter(prefix="/projects/{project_id}/members")
@@ -88,3 +92,30 @@ def list_members(
         page=page.page,
         page_size=page.page_size,
     )
+
+
+@router.patch("/{username}", response_model=MemberResponse)
+def change_member_role(
+    project_id: UUID,
+    username: str,
+    payload: ChangeMemberRoleRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ChangeMemberRoleService, Depends(get_change_member_role_service)],
+) -> MemberResponse:
+    try:
+        member = service.change_role(
+            project_id=project_id,
+            actor_id=account.user_id,
+            username=username,
+            role=payload.role,
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except MemberNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Miembro no encontrado") from None
+    except ProjectPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para cambiar el rol de este miembro"
+        ) from None
+
+    return MemberResponse(username=username, role=member.role, joined_at=member.joined_at)

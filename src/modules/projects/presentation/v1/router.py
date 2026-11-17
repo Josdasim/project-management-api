@@ -156,3 +156,5 @@ def delete_project(
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "No tienes permiso para modificar este proyecto"
         ) from None
+
+
