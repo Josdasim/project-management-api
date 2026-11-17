@@ -21,7 +21,7 @@ class ChangeMemberRoleService:
         project: ProjectRepository,
         member: ProjectMemberRepository,
         account: AccountRepository,
-        unit_work: UnitOfWork,  
+        unit_work: UnitOfWork,
     ) -> None:
         self._project = project
         self._member = member

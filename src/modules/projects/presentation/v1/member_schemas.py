@@ -42,6 +42,7 @@ class MemberListItem(BaseModel):
     role: ProjectRole
     joined_at: datetime
 
+
 class ChangeMemberRoleRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

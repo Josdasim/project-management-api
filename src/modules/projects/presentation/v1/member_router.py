@@ -6,27 +6,27 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.add_member import AddMemberService
-from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
+from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,
+    MemberNotFoundError,
     MemberUserNotFoundError,
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
     ProjectPermissionDeniedError,
-    MemberNotFoundError
 )
 from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
+    get_change_member_role_service,
     get_list_members_service,
-    get_change_member_role_service
 )
 from src.modules.projects.presentation.v1.member_schemas import (
     AddMemberRequest,
+    ChangeMemberRoleRequest,
     MemberListItem,
     MemberListParams,
     MemberResponse,
-    ChangeMemberRoleRequest
 )
 
 router = APIRouter(prefix="/projects/{project_id}/members")
