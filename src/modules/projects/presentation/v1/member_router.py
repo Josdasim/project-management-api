@@ -7,6 +7,7 @@ from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
+from src.modules.projects.application.services.leave_project import LeaveProjectService
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
 from src.modules.projects.domain.exceptions import (
@@ -20,6 +21,7 @@ from src.modules.projects.domain.exceptions import (
 from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
     get_change_member_role_service,
+    get_leave_project_service,
     get_list_members_service,
     get_remove_member_service,
 )
@@ -123,6 +125,23 @@ def change_member_role(
     return MemberResponse(
         username=result.username, role=result.member.role, joined_at=result.member.joined_at
     )
+
+
+@router.delete("/me", status_code=204)
+def leave_project(
+    project_id: UUID,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[LeaveProjectService, Depends(get_leave_project_service)],
+) -> None:
+    try:
+        service.leave(project_id=project_id, user_id=account.user_id)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except ProjectPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            "El Propietario no puede abandonar el proyecto: debe transferir la propiedad o eliminarlo",
+        ) from None
 
 
 @router.delete("/{username}", status_code=204)

@@ -10,6 +10,7 @@ from src.modules.projects.application.services.change_member_role import ChangeM
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
+from src.modules.projects.application.services.leave_project import LeaveProjectService
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
@@ -81,5 +82,13 @@ def get_remove_member_service(db: Annotated[Session, Depends(get_db)]) -> Remove
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
+        unit_work=db,
+    )
+
+
+def get_leave_project_service(db: Annotated[Session, Depends(get_db)]) -> LeaveProjectService:
+    return LeaveProjectService(
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
         unit_work=db,
     )
