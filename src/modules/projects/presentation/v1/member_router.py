@@ -7,9 +7,9 @@ from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.add_member import AddMemberService
 from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
+from src.modules.projects.application.services.leave_project import LeaveProjectService
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
-from src.modules.projects.application.services.leave_project import LeaveProjectService
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,
     MemberNotFoundError,
@@ -21,9 +21,9 @@ from src.modules.projects.domain.exceptions import (
 from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
     get_change_member_role_service,
+    get_leave_project_service,
     get_list_members_service,
     get_remove_member_service,
-    get_leave_project_service
 )
 from src.modules.projects.presentation.v1.member_schemas import (
     AddMemberRequest,

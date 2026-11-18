@@ -15,10 +15,7 @@ from src.modules.projects.domain.exceptions import (
 
 class LeaveProjectService:
     def __init__(
-        self,
-        project: ProjectRepository,
-        member: ProjectMemberRepository,
-        unit_work: UnitOfWork
+        self, project: ProjectRepository, member: ProjectMemberRepository, unit_work: UnitOfWork
     ) -> None:
         self._project = project
         self._member = member
