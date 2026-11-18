@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import exists, select, func
+from sqlalchemy import exists, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 

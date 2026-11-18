@@ -12,12 +12,12 @@ from tests.modules.projects.conftest import (
     REGISTER_URL,
     USER,
     access_token,
+    add_member,
     bearer,
     create,
+    get_project,
     login_token,
     other_token,
-    get_project,
-    add_member
 )
 
 
@@ -46,6 +46,16 @@ def test_propietario_agrega_un_miembro(client, access_token, other_token):
     detail = get_project(client, other_token, project["id"])
     assert detail.status_code == 200
     assert detail.json()["role"] == "member"
+
+
+# RF-MEM-01-CA-04
+def test_agregar_miembro_sin_distinguir_mayusculas(client, access_token, other_token):
+    project = create(client, access_token, name="Mi Proyecto")
+
+    response = add(client, access_token, project["id"], username="OTRO_USERNAME", role="member")
+
+    assert response.status_code == 201
+    assert response.json()["username"] == "otro_username"
 
 
 # RF-MEM-01-CA-02

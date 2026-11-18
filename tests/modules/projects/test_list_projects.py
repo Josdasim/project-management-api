@@ -6,9 +6,14 @@ from sqlalchemy import select
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.infrastructure.models import Project as ProjectModel
 from tests.modules.projects.conftest import (
-    PROJECTS_URL, access_token, bearer, create, other_token,
-    add_member
+    PROJECTS_URL,
+    access_token,
+    add_member,
+    bearer,
+    create,
+    other_token,
 )
+
 
 def list_projects(client, token, **params):
     return client.get(PROJECTS_URL, params=params, headers=bearer(token))

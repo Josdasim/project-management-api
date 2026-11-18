@@ -7,10 +7,14 @@ from sqlalchemy import select
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.infrastructure.models import Project as ProjectModel
 from tests.modules.projects.conftest import (
-    PROJECTS_URL, access_token, bearer, create, other_token,
-    add_member
-
+    PROJECTS_URL,
+    access_token,
+    add_member,
+    bearer,
+    create,
+    other_token,
 )
+
 
 def get_project(client, token, project_id):
     return client.get(f"{PROJECTS_URL}/{project_id}", headers=bearer(token))

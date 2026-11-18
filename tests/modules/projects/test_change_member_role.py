@@ -6,12 +6,12 @@ from src.modules.projects.domain.enums import ProjectRole
 from tests.modules.projects.conftest import (
     PROJECTS_URL,
     access_token,
-    bearer,
-    other_token,
     add_member,
+    bearer,
     get_project,
+    other_token,
+    project,
     third_token,
-    project
 )
 
 
@@ -19,6 +19,16 @@ def change(client, token, project_id, username, **data):
     return client.patch(
         f"{PROJECTS_URL}/{project_id}/members/{username}", json=data, headers=bearer(token)
     )
+
+
+# RF-MEM-03-CA-01
+def test_cambiar_rol_sin_distinguir_mayusculas(client, access_token, other_token, db, project):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.MEMBER)
+
+    response = change(client, access_token, project["id"], "OTRO_USERNAME", role="viewer")
+
+    assert response.status_code == 200
+    assert response.json()["username"] == "otro_username"
 
 
 # RF-MEM-03-CA-01

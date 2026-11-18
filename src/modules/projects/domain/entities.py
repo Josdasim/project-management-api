@@ -47,4 +47,3 @@ class MemberProfile:
 class MemberWithRole:
     member: ProjectMember
     username: str
-

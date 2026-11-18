@@ -12,11 +12,11 @@ from tests.modules.projects.conftest import (
     REGISTER_URL,
     USER,
     access_token,
+    add_member,
     bearer,
     login_token,
     other_token,
-    add_member,
-    project
+    project,
 )
 
 USERS_ME_URL = "/api/v1/users/me"

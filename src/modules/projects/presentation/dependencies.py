@@ -12,8 +12,8 @@ from src.modules.projects.application.services.delete_project import DeleteProje
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
-from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
+from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
 )
@@ -83,4 +83,3 @@ def get_remove_member_service(db: Annotated[Session, Depends(get_db)]) -> Remove
         account=SqlAlchemyAccountRepository(db),
         unit_work=db,
     )
-

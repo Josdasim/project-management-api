@@ -8,7 +8,7 @@ from src.modules.projects.application.interfaces.project_member_repository impor
     ProjectMemberRepository,
 )
 from src.modules.projects.application.interfaces.project_repository import ProjectRepository
-from src.modules.projects.domain.entities import ProjectMember, MemberWithRole
+from src.modules.projects.domain.entities import MemberWithRole, ProjectMember
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.domain.exceptions import (
     MemberAlreadyExistsError,

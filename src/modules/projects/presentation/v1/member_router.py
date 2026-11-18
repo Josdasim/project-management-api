@@ -21,7 +21,7 @@ from src.modules.projects.presentation.dependencies import (
     get_add_member_service,
     get_change_member_role_service,
     get_list_members_service,
-    get_remove_member_service
+    get_remove_member_service,
 )
 from src.modules.projects.presentation.v1.member_schemas import (
     AddMemberRequest,
@@ -120,7 +120,9 @@ def change_member_role(
             status.HTTP_403_FORBIDDEN, "No tienes permiso para cambiar el rol de este miembro"
         ) from None
 
-    return MemberResponse(username=result.username, role=result.member.role, joined_at=result.member.joined_at)
+    return MemberResponse(
+        username=result.username, role=result.member.role, joined_at=result.member.joined_at
+    )
 
 
 @router.delete("/{username}", status_code=204)
