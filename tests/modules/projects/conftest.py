@@ -1,6 +1,6 @@
-import pytest
 from datetime import UTC, datetime
 
+import pytest
 from sqlalchemy import select
 
 from src.modules.auth.infrastructure.models import Account as AccountModel
@@ -35,6 +35,7 @@ def login_token(client, username):
 
 def create(client, token, **data):
     return client.post(PROJECTS_URL, json=data, headers=bearer(token)).json()
+
 
 def get_project(client, token, project_id):
     return client.get(f"{PROJECTS_URL}/{project_id}", headers=bearer(token))
