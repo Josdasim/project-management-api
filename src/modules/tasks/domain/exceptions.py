@@ -12,3 +12,7 @@ class TaskPermissionDeniedError(TasksError):
 
 class InvalidAssigneeError(TasksError):
     pass
+
+
+class InvalidStatusTransitionError(TasksError):
+    pass
