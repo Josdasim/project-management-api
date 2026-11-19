@@ -10,9 +10,11 @@ from src.modules.tasks.application.services.change_task_status import ChangeTask
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.application.services.list_tasks import ListTasksService
+from src.modules.tasks.application.services.update_task import UpdateTaskService
 from src.modules.tasks.domain.exceptions import (
     InvalidAssigneeError,
     InvalidStatusTransitionError,
+    TaskNotEditableError,
     TaskNotFoundError,
     TaskPermissionDeniedError,
 )
@@ -21,12 +23,14 @@ from src.modules.tasks.presentation.dependencies import (
     get_create_task_service,
     get_list_tasks_service,
     get_task_service,
+    get_update_task_service,
 )
 from src.modules.tasks.presentation.v1.schemas import (
     ChangeTaskStatusRequest,
     CreateTaskRequest,
     TaskListParams,
     TaskResponse,
+    UpdateTaskRequest,
 )
 
 router = APIRouter(prefix="/projects/{project_id}/tasks", tags=["tasks"])
@@ -167,6 +171,47 @@ def change_task_status(
     except InvalidStatusTransitionError:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "El cambio de estado solicitado no esta permitido"
+        ) from None
+
+    return TaskResponse(
+        id=detail.task.id,
+        title=detail.task.title,
+        description=detail.task.description,
+        status=detail.task.status,
+        priority=detail.task.priority,
+        created_by=detail.created_by_username,
+        assigned_to=detail.assigned_to_username,
+        created_at=detail.task.created_at,
+        updated_at=detail.task.updated_at,
+    )
+
+
+@router.patch("/{task_id}", response_model=TaskResponse)
+def update_task(
+    project_id: UUID,
+    task_id: UUID,
+    payload: UpdateTaskRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[UpdateTaskService, Depends(get_update_task_service)],
+) -> TaskResponse:
+    try:
+        detail = service.update(
+            project_id=project_id,
+            task_id=task_id,
+            actor_id=account.user_id,
+            changes=payload.model_dump(exclude_unset=True),
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except TaskNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarea no encontrada") from None
+    except TaskPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para editar esta tarea"
+        ) from None
+    except TaskNotEditableError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Una tarea completada o cancelada no se puede editar"
         ) from None
 
     return TaskResponse(

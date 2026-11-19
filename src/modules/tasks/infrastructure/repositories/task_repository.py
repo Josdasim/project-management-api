@@ -107,7 +107,12 @@ class SqlAlchemyTaskRepository:
 
     def update(self, task: Task) -> Task:
         model = self._session.get(TaskModel, task.id)
+        model.title = task.title
+        model.description = task.description
         model.status = task.status
+        model.priority = task.priority
+        model.assigned_to = task.assigned_to
+
         self._session.flush()
         self._session.refresh(model)
         return _to_entity(model)
