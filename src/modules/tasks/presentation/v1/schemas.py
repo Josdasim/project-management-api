@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, StringConstraints
+from pydantic import BaseModel, ConfigDict, StringConstraints, model_validator
 
 from src.core.pagination import PaginationParams
 from src.modules.tasks.domain.enums import TaskPriority, TaskStatus
@@ -44,6 +44,21 @@ class TaskListParams(PaginationParams):
     priority: TaskPriority | None = None
     assigned_to: UsernameStr | None = None
     search: SearchStr | None = None
+
+
+class UpdateTaskRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: TaskTitleStr | None = None
+    description: TaskDescriptionStr | None = None
+    priority: TaskPriority | None = None
+
+    @model_validator(mode="after")
+    def reject_null_required_fields(self) -> "UpdateTaskRequest":
+        for name in ("title", "priority"):
+            if name in self.model_fields_set and getattr(self, name) is None:
+                raise ValueError(f"{name} no puede ser nulo")
+        return self
 
 
 class ChangeTaskStatusRequest(BaseModel):

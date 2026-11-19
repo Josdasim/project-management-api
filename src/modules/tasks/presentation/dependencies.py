@@ -13,6 +13,7 @@ from src.modules.tasks.application.services.change_task_status import ChangeTask
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.application.services.list_tasks import ListTasksService
+from src.modules.tasks.application.services.update_task import UpdateTaskService
 from src.modules.tasks.infrastructure.repositories.task_repository import SqlAlchemyTaskRepository
 
 
@@ -46,6 +47,15 @@ def get_change_task_status_service(
     db: Annotated[Session, Depends(get_db)],
 ) -> ChangeTaskStatusService:
     return ChangeTaskStatusService(
+        task=SqlAlchemyTaskRepository(db),
+        project=SqlAlchemyProjectRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+        unit_work=db,
+    )
+
+
+def get_update_task_service(db: Annotated[Session, Depends(get_db)]) -> UpdateTaskService:
+    return UpdateTaskService(
         task=SqlAlchemyTaskRepository(db),
         project=SqlAlchemyProjectRepository(db),
         account=SqlAlchemyAccountRepository(db),

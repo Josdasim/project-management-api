@@ -16,3 +16,7 @@ class InvalidAssigneeError(TasksError):
 
 class InvalidStatusTransitionError(TasksError):
     pass
+
+
+class TaskNotEditableError(TasksError):
+    pass
