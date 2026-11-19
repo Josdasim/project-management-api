@@ -6,8 +6,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.public import ProjectNotFoundError
 from src.modules.tasks.application.services.create_task import CreateTaskService
-from src.modules.tasks.domain.exceptions import InvalidAssigneeError, TaskPermissionDeniedError
-from src.modules.tasks.presentation.dependencies import get_create_task_service
+from src.modules.tasks.application.services.get_task import GetTaskService
+from src.modules.tasks.domain.exceptions import (
+    InvalidAssigneeError,
+    TaskNotFoundError,
+    TaskPermissionDeniedError,
+)
+from src.modules.tasks.presentation.dependencies import get_create_task_service, get_task_service
 from src.modules.tasks.presentation.v1.schemas import CreateTaskRequest, TaskResponse
 
 router = APIRouter(prefix="/projects/{project_id}/tasks", tags=["tasks"])
@@ -39,6 +44,33 @@ def create_task(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, "El responsable indicado no es valido"
         ) from None
+
+    return TaskResponse(
+        id=detail.task.id,
+        title=detail.task.title,
+        description=detail.task.description,
+        status=detail.task.status,
+        priority=detail.task.priority,
+        created_by=detail.created_by_username,
+        assigned_to=detail.assigned_to_username,
+        created_at=detail.task.created_at,
+        updated_at=detail.task.updated_at,
+    )
+
+
+@router.get("/{task_id}", response_model=TaskResponse)
+def read_task(
+    project_id: UUID,
+    task_id: UUID,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[GetTaskService, Depends(get_task_service)],
+) -> TaskResponse:
+    try:
+        detail = service.get(project_id=project_id, task_id=task_id, user_id=account.user_id)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except TaskNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarea no encontrada") from None
 
     return TaskResponse(
         id=detail.task.id,

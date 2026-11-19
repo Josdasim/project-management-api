@@ -10,6 +10,7 @@ from src.modules.projects.public import (
     SqlAlchemyProjectRepository,
 )
 from src.modules.tasks.application.services.create_task import CreateTaskService
+from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.infrastructure.repositories.task_repository import SqlAlchemyTaskRepository
 
 
@@ -20,4 +21,12 @@ def get_create_task_service(db: Annotated[Session, Depends(get_db)]) -> CreateTa
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
         unit_work=db,
+    )
+
+
+def get_task_service(db: Annotated[Session, Depends(get_db)]) -> GetTaskService:
+    return GetTaskService(
+        task=SqlAlchemyTaskRepository(db),
+        project=SqlAlchemyProjectRepository(db),
+        account=SqlAlchemyAccountRepository(db),
     )

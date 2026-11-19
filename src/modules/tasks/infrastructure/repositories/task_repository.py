@@ -1,3 +1,6 @@
+from uuid import UUID
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.modules.tasks.domain.entities import Task
@@ -37,3 +40,9 @@ class SqlAlchemyTaskRepository:
         self._session.add(model)
         self._session.flush()
         return _to_entity(model)
+
+    def get_by_id_and_project(self, task_id: UUID, project_id: UUID) -> Task | None:
+        model = self._session.scalar(
+            select(TaskModel).where(TaskModel.id == task_id, TaskModel.project_id == project_id)
+        )
+        return _to_entity(model) if model else None
