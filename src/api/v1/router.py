@@ -4,9 +4,11 @@ from src.modules.auth.presentation.v1.router import router as auth_router
 from src.modules.projects.presentation.v1.member_router import router as member_router
 from src.modules.projects.presentation.v1.router import router as project_router
 from src.modules.users.presentation.v1.router import router as users_router
+from src.modules.tasks.presentation.v1.router import router as task_router
 
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(auth_router)
 api_router.include_router(users_router)
 api_router.include_router(project_router)
 api_router.include_router(member_router)
+api_router.include_router(task_router)
