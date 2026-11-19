@@ -11,6 +11,7 @@ from src.modules.projects.public import (
 )
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
+from src.modules.tasks.application.services.list_tasks import ListTasksService
 from src.modules.tasks.infrastructure.repositories.task_repository import SqlAlchemyTaskRepository
 
 
@@ -26,6 +27,14 @@ def get_create_task_service(db: Annotated[Session, Depends(get_db)]) -> CreateTa
 
 def get_task_service(db: Annotated[Session, Depends(get_db)]) -> GetTaskService:
     return GetTaskService(
+        task=SqlAlchemyTaskRepository(db),
+        project=SqlAlchemyProjectRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+    )
+
+
+def get_list_tasks_service(db: Annotated[Session, Depends(get_db)]) -> ListTasksService:
+    return ListTasksService(
         task=SqlAlchemyTaskRepository(db),
         project=SqlAlchemyProjectRepository(db),
         account=SqlAlchemyAccountRepository(db),
