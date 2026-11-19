@@ -7,7 +7,7 @@ from src.modules.projects.public import (
     ProjectMemberRepository,
     ProjectNotFoundError,
     ProjectRepository,
-    ProjectRole
+    ProjectRole,
 )
 from src.modules.tasks.application.interfaces.task_repository import TaskRepository
 from src.modules.tasks.domain.entities import Task, TaskDetail
@@ -31,7 +31,8 @@ class CreateTaskService:
         self._unit_work = unit_work
 
     def create(
-        self,*,
+        self,
+        *,
         project_id: UUID,
         actor_id: UUID,
         title: str,
