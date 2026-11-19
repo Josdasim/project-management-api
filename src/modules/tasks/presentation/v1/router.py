@@ -1,19 +1,29 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.public import ProjectNotFoundError
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
+from src.modules.tasks.application.services.list_tasks import ListTasksService
 from src.modules.tasks.domain.exceptions import (
     InvalidAssigneeError,
     TaskNotFoundError,
     TaskPermissionDeniedError,
 )
-from src.modules.tasks.presentation.dependencies import get_create_task_service, get_task_service
-from src.modules.tasks.presentation.v1.schemas import CreateTaskRequest, TaskResponse
+from src.modules.tasks.presentation.dependencies import (
+    get_create_task_service,
+    get_list_tasks_service,
+    get_task_service,
+)
+from src.modules.tasks.presentation.v1.schemas import (
+    CreateTaskRequest,
+    TaskListParams,
+    TaskResponse,
+)
 
 router = APIRouter(prefix="/projects/{project_id}/tasks", tags=["tasks"])
 
@@ -82,4 +92,46 @@ def read_task(
         assigned_to=detail.assigned_to_username,
         created_at=detail.task.created_at,
         updated_at=detail.task.updated_at,
+    )
+
+
+@router.get("", response_model=PageResponse[TaskResponse])
+def list_tasks(
+    project_id: UUID,
+    params: Annotated[TaskListParams, Query()],
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ListTasksService, Depends(get_list_tasks_service)],
+) -> PageResponse[TaskResponse]:
+    try:
+        page = service.list_tasks(
+            project_id=project_id,
+            user_id=account.user_id,
+            status=params.status,
+            priority=params.priority,
+            assigned_to=params.assigned_to,
+            search=params.search,
+            page=params.page,
+            page_size=params.page_size,
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+
+    return PageResponse[TaskResponse](
+        items=[
+            TaskResponse(
+                id=item.task.id,
+                title=item.task.title,
+                description=item.task.description,
+                status=item.task.status,
+                priority=item.task.priority,
+                created_by=item.created_by_username,
+                assigned_to=item.assigned_to_username,
+                created_at=item.task.created_at,
+                updated_at=item.task.updated_at,
+            )
+            for item in page.items
+        ],
+        total=page.total,
+        page=page.page,
+        page_size=page.page_size,
     )

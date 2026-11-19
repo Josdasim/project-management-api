@@ -4,6 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, StringConstraints
 
+from src.core.pagination import PaginationParams
 from src.modules.tasks.domain.enums import TaskPriority, TaskStatus
 
 TITLE_MAX = 200
@@ -14,6 +15,7 @@ TaskTitleStr = Annotated[
 ]
 TaskDescriptionStr = Annotated[str, StringConstraints(max_length=DESCRIPTION_MAX)]
 UsernameStr = Annotated[str, StringConstraints(strip_whitespace=True, min_length=3)]
+SearchStr = Annotated[str, StringConstraints(strip_whitespace=True, max_length=TITLE_MAX)]
 
 
 class CreateTaskRequest(BaseModel):
@@ -35,3 +37,10 @@ class TaskResponse(BaseModel):
     assigned_to: str | None
     created_at: datetime
     updated_at: datetime
+
+
+class TaskListParams(PaginationParams):
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
+    assigned_to: UsernameStr | None = None
+    search: SearchStr | None = None
