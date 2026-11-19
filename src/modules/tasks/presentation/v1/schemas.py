@@ -44,3 +44,9 @@ class TaskListParams(PaginationParams):
     priority: TaskPriority | None = None
     assigned_to: UsernameStr | None = None
     search: SearchStr | None = None
+
+
+class ChangeTaskStatusRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    status: TaskStatus

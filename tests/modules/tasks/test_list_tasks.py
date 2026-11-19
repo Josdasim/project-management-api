@@ -9,13 +9,12 @@ from src.modules.projects.infrastructure.models import Project as ProjectModel
 from src.modules.tasks.domain.enums import TaskStatus
 from tests.modules.projects.conftest import (
     PROJECTS_URL,
-    access_token,
     add_member,
     bearer,
     create,
     other_token,
 )
-from tests.modules.tasks.conftest import new_task, project, set_status
+from tests.modules.tasks.conftest import new_task, set_status
 
 
 def list_tasks(client, token, project_id, **params):

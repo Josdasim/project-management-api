@@ -6,20 +6,24 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.public import ProjectNotFoundError
+from src.modules.tasks.application.services.change_task_status import ChangeTaskStatusService
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.application.services.list_tasks import ListTasksService
 from src.modules.tasks.domain.exceptions import (
     InvalidAssigneeError,
+    InvalidStatusTransitionError,
     TaskNotFoundError,
     TaskPermissionDeniedError,
 )
 from src.modules.tasks.presentation.dependencies import (
+    get_change_task_status_service,
     get_create_task_service,
     get_list_tasks_service,
     get_task_service,
 )
 from src.modules.tasks.presentation.v1.schemas import (
+    ChangeTaskStatusRequest,
     CreateTaskRequest,
     TaskListParams,
     TaskResponse,
@@ -134,4 +138,45 @@ def list_tasks(
         total=page.total,
         page=page.page,
         page_size=page.page_size,
+    )
+
+
+@router.patch("/{task_id}/status", response_model=TaskResponse)
+def change_task_status(
+    project_id: UUID,
+    task_id: UUID,
+    payload: ChangeTaskStatusRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ChangeTaskStatusService, Depends(get_change_task_status_service)],
+) -> TaskResponse:
+    try:
+        detail = service.change_status(
+            project_id=project_id,
+            task_id=task_id,
+            actor_id=account.user_id,
+            status=payload.status,
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except TaskNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarea no encontrada") from None
+    except TaskPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para cambiar el estado de esta tarea"
+        ) from None
+    except InvalidStatusTransitionError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "El cambio de estado solicitado no esta permitido"
+        ) from None
+
+    return TaskResponse(
+        id=detail.task.id,
+        title=detail.task.title,
+        description=detail.task.description,
+        status=detail.task.status,
+        priority=detail.task.priority,
+        created_by=detail.created_by_username,
+        assigned_to=detail.assigned_to_username,
+        created_at=detail.task.created_at,
+        updated_at=detail.task.updated_at,
     )

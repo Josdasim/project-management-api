@@ -104,3 +104,10 @@ class SqlAlchemyTaskRepository:
             project_id, status, priority, assigned_to, search
         ).subquery()
         return self._session.scalar(select(func.count()).select_from(subquery)) or 0
+
+    def update(self, task: Task) -> Task:
+        model = self._session.get(TaskModel, task.id)
+        model.status = task.status
+        self._session.flush()
+        self._session.refresh(model)
+        return _to_entity(model)
