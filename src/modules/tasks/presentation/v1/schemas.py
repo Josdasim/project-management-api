@@ -65,3 +65,9 @@ class ChangeTaskStatusRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     status: TaskStatus
+
+
+class AssignTaskRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    assigned_to: UsernameStr | None

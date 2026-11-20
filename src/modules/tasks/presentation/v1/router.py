@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from src.core.pagination import PageResponse
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.public import ProjectNotFoundError
+from src.modules.tasks.application.services.assign_task import AssignTaskService
 from src.modules.tasks.application.services.change_task_status import ChangeTaskStatusService
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
@@ -19,6 +20,7 @@ from src.modules.tasks.domain.exceptions import (
     TaskPermissionDeniedError,
 )
 from src.modules.tasks.presentation.dependencies import (
+    get_assign_task_service,
     get_change_task_status_service,
     get_create_task_service,
     get_list_tasks_service,
@@ -26,6 +28,7 @@ from src.modules.tasks.presentation.dependencies import (
     get_update_task_service,
 )
 from src.modules.tasks.presentation.v1.schemas import (
+    AssignTaskRequest,
     ChangeTaskStatusRequest,
     CreateTaskRequest,
     TaskListParams,
@@ -212,6 +215,52 @@ def update_task(
     except TaskNotEditableError:
         raise HTTPException(
             status.HTTP_409_CONFLICT, "Una tarea completada o cancelada no se puede editar"
+        ) from None
+
+    return TaskResponse(
+        id=detail.task.id,
+        title=detail.task.title,
+        description=detail.task.description,
+        status=detail.task.status,
+        priority=detail.task.priority,
+        created_by=detail.created_by_username,
+        assigned_to=detail.assigned_to_username,
+        created_at=detail.task.created_at,
+        updated_at=detail.task.updated_at,
+    )
+
+
+@router.patch("/{task_id}/assignee", response_model=TaskResponse)
+def assign_task(
+    project_id: UUID,
+    task_id: UUID,
+    payload: AssignTaskRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[AssignTaskService, Depends(get_assign_task_service)],
+) -> TaskResponse:
+    try:
+        detail = service.assign(
+            project_id=project_id,
+            task_id=task_id,
+            actor_id=account.user_id,
+            assigned_to=payload.assigned_to,
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except TaskNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarea no encontrada") from None
+    except TaskPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tienes permiso para asignar esta tarea"
+        ) from None
+    except TaskNotEditableError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "No se puede cambiar el responsable de una tarea completada o cancelada",
+        ) from None
+    except InvalidAssigneeError:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "El responsable indicado no es valido"
         ) from None
 
     return TaskResponse(

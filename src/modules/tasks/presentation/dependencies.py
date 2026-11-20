@@ -9,6 +9,7 @@ from src.modules.projects.public import (
     SqlAlchemyProjectMemberRepository,
     SqlAlchemyProjectRepository,
 )
+from src.modules.tasks.application.services.assign_task import AssignTaskService
 from src.modules.tasks.application.services.change_task_status import ChangeTaskStatusService
 from src.modules.tasks.application.services.create_task import CreateTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
@@ -58,6 +59,16 @@ def get_update_task_service(db: Annotated[Session, Depends(get_db)]) -> UpdateTa
     return UpdateTaskService(
         task=SqlAlchemyTaskRepository(db),
         project=SqlAlchemyProjectRepository(db),
+        account=SqlAlchemyAccountRepository(db),
+        unit_work=db,
+    )
+
+
+def get_assign_task_service(db: Annotated[Session, Depends(get_db)]) -> AssignTaskService:
+    return AssignTaskService(
+        task=SqlAlchemyTaskRepository(db),
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
         unit_work=db,
     )
