@@ -9,6 +9,7 @@ from src.modules.projects.public import ProjectNotFoundError
 from src.modules.tasks.application.services.assign_task import AssignTaskService
 from src.modules.tasks.application.services.change_task_status import ChangeTaskStatusService
 from src.modules.tasks.application.services.create_task import CreateTaskService
+from src.modules.tasks.application.services.delete_task import DeleteTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.application.services.list_tasks import ListTasksService
 from src.modules.tasks.application.services.update_task import UpdateTaskService
@@ -23,6 +24,7 @@ from src.modules.tasks.presentation.dependencies import (
     get_assign_task_service,
     get_change_task_status_service,
     get_create_task_service,
+    get_delete_task_service,
     get_list_tasks_service,
     get_task_service,
     get_update_task_service,
@@ -274,3 +276,22 @@ def assign_task(
         created_at=detail.task.created_at,
         updated_at=detail.task.updated_at,
     )
+
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(
+    project_id: UUID,
+    task_id: UUID,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[DeleteTaskService, Depends(get_delete_task_service)],
+) -> None:
+    try:
+        service.delete(project_id=project_id, task_id=task_id, actor_id=account.user_id)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except TaskNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tarea no encontrada") from None
+    except TaskPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "No tiene permiso para eliminar esta tarea"
+        ) from None

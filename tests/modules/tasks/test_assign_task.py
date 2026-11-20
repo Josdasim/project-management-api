@@ -386,3 +386,19 @@ def test_rechazar_peticion_sin_token(client, access_token, project):
     )
 
     assert response.status_code == 401
+
+
+# RF-TASK-05-CA-06
+def test_rechazar_al_miembro_desasignarse_de_una_tarea_suya_completada(
+    client, access_token, other_token, db, project
+):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.MEMBER)
+    task = new_task(
+        client, access_token, project["id"], title="Mi tarea", assigned_to="otro_username"
+    )
+    set_status(db, task["id"], TaskStatus.COMPLETED)
+
+    response = assign_task(client, other_token, project["id"], task["id"], None)
+
+    assert response.status_code == 409
+    assert stored_assignee(db, task["id"]) is not None

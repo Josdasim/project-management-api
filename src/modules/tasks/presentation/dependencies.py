@@ -12,6 +12,7 @@ from src.modules.projects.public import (
 from src.modules.tasks.application.services.assign_task import AssignTaskService
 from src.modules.tasks.application.services.change_task_status import ChangeTaskStatusService
 from src.modules.tasks.application.services.create_task import CreateTaskService
+from src.modules.tasks.application.services.delete_task import DeleteTaskService
 from src.modules.tasks.application.services.get_task import GetTaskService
 from src.modules.tasks.application.services.list_tasks import ListTasksService
 from src.modules.tasks.application.services.update_task import UpdateTaskService
@@ -70,5 +71,13 @@ def get_assign_task_service(db: Annotated[Session, Depends(get_db)]) -> AssignTa
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
+        unit_work=db,
+    )
+
+
+def get_delete_task_service(db: Annotated[Session, Depends(get_db)]) -> DeleteTaskService:
+    return DeleteTaskService(
+        task=SqlAlchemyTaskRepository(db),
+        project=SqlAlchemyProjectRepository(db),
         unit_work=db,
     )
