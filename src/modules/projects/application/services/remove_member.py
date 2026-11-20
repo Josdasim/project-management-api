@@ -3,6 +3,7 @@ from uuid import UUID
 
 from src.core.unit_of_work import UnitOfWork
 from src.modules.auth.public import AccountRepository
+from src.modules.projects.application.interfaces.member_task_unassigner import MemberTaskUnassigner
 from src.modules.projects.application.interfaces.project_member_repository import (
     ProjectMemberRepository,
 )
@@ -21,11 +22,13 @@ class RemoveMemberService:
         project: ProjectRepository,
         member: ProjectMemberRepository,
         account: AccountRepository,
+        tasks: MemberTaskUnassigner,
         unit_work: UnitOfWork,
     ) -> None:
         self._project = project
         self._member = member
         self._account = account
+        self._tasks = tasks
         self._unit_work = unit_work
 
     def remove(self, *, project_id: UUID, actor_id: UUID, username: str) -> None:
@@ -49,4 +52,5 @@ class RemoveMemberService:
 
         target.left_at = datetime.now(UTC)
         self._member.update(target)
+        self._tasks.unassign_member_tasks(project_id, account.user_id)
         self._unit_work.commit()

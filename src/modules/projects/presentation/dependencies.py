@@ -21,6 +21,7 @@ from src.modules.projects.infrastructure.repositories.project_member_repository 
 from src.modules.projects.infrastructure.repositories.project_repository import (
     SqlAlchemyProjectRepository,
 )
+from src.modules.tasks.public import SqlAlchemyMemberTaskUnassigner
 from src.modules.users.public import SqlAlchemyUserRepository
 
 
@@ -82,6 +83,7 @@ def get_remove_member_service(db: Annotated[Session, Depends(get_db)]) -> Remove
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
         account=SqlAlchemyAccountRepository(db),
+        tasks=SqlAlchemyMemberTaskUnassigner(db),
         unit_work=db,
     )
 
@@ -90,5 +92,6 @@ def get_leave_project_service(db: Annotated[Session, Depends(get_db)]) -> LeaveP
     return LeaveProjectService(
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
+        tasks=SqlAlchemyMemberTaskUnassigner(db),
         unit_work=db,
     )
