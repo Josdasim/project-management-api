@@ -2,13 +2,14 @@ import uuid
 from uuid import UUID
 
 from src.core.unit_of_work import UnitOfWork
-from src.modules.auth.public import AccountRepository, AccountStatus
+from src.modules.auth.public import AccountRepository
 from src.modules.projects.public import (
     ProjectMemberRepository,
     ProjectNotFoundError,
     ProjectRepository,
     ProjectRole,
 )
+from src.modules.tasks.application.assignee import validate_assignee
 from src.modules.tasks.application.interfaces.task_repository import TaskRepository
 from src.modules.tasks.domain.entities import Task, TaskDetail
 from src.modules.tasks.domain.enums import TaskPriority
@@ -53,16 +54,7 @@ class CreateTaskService:
                 account is None or account.user_id != actor_id
             ):
                 raise TaskPermissionDeniedError
-            if account is None or account.status != AccountStatus.ACTIVE:
-                raise InvalidAssigneeError
-            membership = self._member.get_by_project_and_user(project_id, account.user_id)
-            if (
-                membership is None
-                or membership.left_at is not None
-                or membership.role == ProjectRole.VIEWER
-            ):
-                raise InvalidAssigneeError
-            assignee_id = account.user_id
+            assignee_id = validate_assignee(self._member, project_id, account)
 
         task = self._task.add(
             Task(
