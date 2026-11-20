@@ -303,3 +303,16 @@ def test_rechazar_peticion_sin_token(client, access_token, project):
     )
 
     assert response.status_code == 401
+
+
+# RF-TASK-06-CA-02 y CA-03 (TASK-06.12)
+@pytest.mark.parametrize("target", [TaskStatus.COMPLETED, TaskStatus.PENDING])
+def test_rechazar_al_miembro_sin_la_tarea_con_403_aunque_la_transicion_sea_invalida(
+    client, access_token, other_token, db, project, target
+):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.MEMBER)
+    task = new_task(client, other_token, project["id"], title="Mi tarea")
+
+    response = change_status(client, other_token, project["id"], task["id"], target)
+
+    assert response.status_code == 403
