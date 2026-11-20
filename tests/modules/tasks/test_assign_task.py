@@ -402,3 +402,30 @@ def test_rechazar_al_miembro_desasignarse_de_una_tarea_suya_completada(
 
     assert response.status_code == 409
     assert stored_assignee(db, task["id"]) is not None
+
+
+# RF-TASK-05-CA-06 (TASK-05.12)
+@pytest.mark.parametrize("current", [TaskStatus.COMPLETED, TaskStatus.CANCELLED])
+def test_rechazar_al_observador_con_403_aunque_la_tarea_este_cerrada(
+    client, access_token, other_token, db, project, current
+):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.VIEWER)
+    task = new_task(client, access_token, project["id"], title="Mi tarea")
+    set_status(db, task["id"], current)
+
+    response = assign_task(client, other_token, project["id"], task["id"], "otro_username")
+
+    assert response.status_code == 403
+
+
+# RF-TASK-05-CA-06 (TASK-05.12)
+def test_rechazar_al_miembro_asignar_a_otro_con_403_aunque_la_tarea_este_cerrada(
+    client, access_token, other_token, db, project
+):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.MEMBER)
+    task = new_task(client, access_token, project["id"], title="Mi tarea")
+    set_status(db, task["id"], TaskStatus.CANCELLED)
+
+    response = assign_task(client, other_token, project["id"], task["id"], "dana_01")
+
+    assert response.status_code == 403

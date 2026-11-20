@@ -308,3 +308,17 @@ def test_rechazar_peticion_sin_token(client, access_token, project):
     response = client.patch(f"{PROJECTS_URL}/{project['id']}/tasks/{task['id']}", json=NEW_DATA)
 
     assert response.status_code == 401
+
+
+# RF-TASK-04-CA-05 (TASK-04.13)
+@pytest.mark.parametrize("current", [TaskStatus.COMPLETED, TaskStatus.CANCELLED])
+def test_rechazar_al_observador_con_403_aunque_la_tarea_este_cerrada(
+    client, access_token, other_token, db, project, current
+):
+    add_member(db, "Mi Proyecto", "otro_username", ProjectRole.VIEWER)
+    task = new_task(client, access_token, project["id"], title="Mi tarea")
+    set_status(db, task["id"], current)
+
+    response = edit_task(client, other_token, project["id"], task["id"], NEW_DATA)
+
+    assert response.status_code == 403
