@@ -116,3 +116,8 @@ class SqlAlchemyTaskRepository:
         self._session.flush()
         self._session.refresh(model)
         return _to_entity(model)
+
+    def delete(self, task: Task) -> None:
+        model = self._session.get(TaskModel, task.id)
+        self._session.delete(model)
+        self._session.flush()
