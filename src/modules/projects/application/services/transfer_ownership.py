@@ -47,7 +47,7 @@ class TransferOwnershipService:
             raise InvalidNewOwnerError
 
         project = actor.project
-        if self._project.name_exists(account.user_id, project.name):
+        if self._project.name_exists(account.user_id, actor.project.name):
             raise ProjectNameAlreadyExistsError
 
         previous = self._member.get_by_project_and_user(project_id, actor_id)
@@ -58,7 +58,7 @@ class TransferOwnershipService:
         self._member.update(target)
 
         project.owner_id = account.user_id
-        self._project.update(project)
+        self._project.change_owner(project_id, account.user_id)
 
         self._unit_work.commit()
 
