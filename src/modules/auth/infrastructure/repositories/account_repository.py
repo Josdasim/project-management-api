@@ -72,3 +72,8 @@ class SqlAlchemyAccountRepository:
     def list_by_user_ids(self, user_ids: list[UUID]) -> list[Account]:
         statement = select(AccountModel).where(AccountModel.user_id.in_(user_ids))
         return [_to_entity(model) for model in self._session.scalars(statement)]
+
+    def update_password_hash(self, account_id: UUID, password_hash: str) -> None:
+        model = self._session.get(AccountModel, account_id)
+        model.password_hash = password_hash
+        self._session.flush()

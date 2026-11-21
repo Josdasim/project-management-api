@@ -16,3 +16,7 @@ class InvalidTokenError(AuthError):
 
 class InvalidCredentialsError(AuthError):
     """Credenciales incorrectas o cuenta no habilitada para iniciar sesion"""
+
+
+class InvalidCurrentPasswordError(AuthError):
+    pass

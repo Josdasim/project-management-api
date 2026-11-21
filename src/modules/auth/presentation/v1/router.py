@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.modules.auth.application.services.change_password import ChangePasswordService
 from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.application.services.logout import LogoutService
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
@@ -10,10 +11,12 @@ from src.modules.auth.domain.entities import Account
 from src.modules.auth.domain.exceptions import (
     EmailAlreadyExistsError,
     InvalidCredentialsError,
+    InvalidCurrentPasswordError,
     InvalidTokenError,
     UsernameAlreadyExistsError,
 )
 from src.modules.auth.presentation.dependencies import (
+    get_change_password_service,
     get_current_account,
     get_login_service,
     get_logout_service,
@@ -22,6 +25,7 @@ from src.modules.auth.presentation.dependencies import (
 )
 from src.modules.auth.presentation.v1.schemas import (
     AccountResponse,
+    ChangePasswordRequest,
     LoginRequest,
     LoginResponse,
     RefreshRequest,
@@ -109,3 +113,21 @@ def logout(
     payload: RefreshRequest, service: Annotated[LogoutService, Depends(get_logout_service)]
 ) -> None:
     service.logout(genereted_refresh_token=payload.refresh_token)
+
+
+@router.put("/password", status_code=status.HTTP_204_NO_CONTENT)
+def change_password(
+    payload: ChangePasswordRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ChangePasswordService, Depends(get_change_password_service)],
+) -> None:
+    try:
+        service.change_password(
+            account=account,
+            current_password=payload.current_password,
+            new_password=payload.new_password,
+        )
+    except InvalidCurrentPasswordError:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "La contraseña actual no es correcta"
+        ) from None
