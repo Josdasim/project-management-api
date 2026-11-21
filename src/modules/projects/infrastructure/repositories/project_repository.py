@@ -116,3 +116,22 @@ class SqlAlchemyProjectRepository:
                 raise ProjectNameAlreadyExistsError from error
             raise
         return _to_entity(model)
+
+    def lock(self, project_id: UUID) -> None:
+        self._session.execute(
+            select(ProjectModel.id).where(ProjectModel.id == project_id).with_for_update()
+        )
+
+    def change_owner(self, project_id: UUID, owner_id: UUID) -> Project:
+        model = self._session.get(ProjectModel, project_id)
+        model.owner_id = owner_id
+
+        try:
+            self._session.flush()
+        except IntegrityError as error:
+            constraint = getattr(error.orig.diag, "constraint_name", None) or ""
+
+            if "lower_name" in constraint:
+                raise ProjectNameAlreadyExistsError from error
+            raise
+        return _to_entity(model)

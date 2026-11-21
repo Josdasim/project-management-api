@@ -24,3 +24,7 @@ class MemberAlreadyExistsError(ProjectsError):
 
 class MemberNotFoundError(ProjectsError):
     pass
+
+
+class InvalidNewOwnerError(ProjectsError):
+    pass
