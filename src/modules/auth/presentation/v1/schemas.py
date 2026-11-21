@@ -68,3 +68,10 @@ class RefreshRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     refresh_token: str = Field(min_length=1, max_length=512, repr=False)
+
+
+class ChangePasswordRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    current_password: str = Field(min_length=1, max_length=PASSWORD_MAX, repr=False)
+    new_password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX, repr=False)
