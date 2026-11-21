@@ -14,6 +14,7 @@ from src.modules.projects.application.services.leave_project import LeaveProject
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
+from src.modules.projects.application.services.transfer_ownership import TransferOwnershipService
 from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
     SqlAlchemyProjectMemberRepository,
@@ -93,5 +94,16 @@ def get_leave_project_service(db: Annotated[Session, Depends(get_db)]) -> LeaveP
         project=SqlAlchemyProjectRepository(db),
         member=SqlAlchemyProjectMemberRepository(db),
         tasks=SqlAlchemyMemberTaskUnassigner(db),
+        unit_work=db,
+    )
+
+
+def get_transfer_ownership_service(
+    db: Annotated[Session, Depends(get_db)],
+) -> TransferOwnershipService:
+    return TransferOwnershipService(
+        project=SqlAlchemyProjectRepository(db),
+        member=SqlAlchemyProjectMemberRepository(db),
+        account=SqlAlchemyAccountRepository(db),
         unit_work=db,
     )

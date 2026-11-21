@@ -9,8 +9,10 @@ from src.modules.projects.application.services.create_project import CreateProje
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_projects import ListProjectsService
+from src.modules.projects.application.services.transfer_ownership import TransferOwnershipService
 from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.domain.exceptions import (
+    InvalidNewOwnerError,
     ProjectNameAlreadyExistsError,
     ProjectNotFoundError,
     ProjectPermissionDeniedError,
@@ -20,14 +22,17 @@ from src.modules.projects.presentation.dependencies import (
     get_delete_project_service,
     get_list_projects_service,
     get_project_service,
+    get_transfer_ownership_service,
     get_update_project_service,
 )
+from src.modules.projects.presentation.v1.member_schemas import MemberResponse
 from src.modules.projects.presentation.v1.schemas import (
     CreateProjectRequest,
     ProjectDetailResponse,
     ProjectListItem,
     ProjectListParams,
     ProjectResponse,
+    TransferOwnershipRequest,
     UpdateProjectRequest,
 )
 
@@ -156,3 +161,35 @@ def delete_project(
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, "No tienes permiso para modificar este proyecto"
         ) from None
+
+
+@router.post("/{project_id}/transfer-ownership", response_model=MemberResponse)
+def transfer_ownership(
+    project_id: UUID,
+    payload: TransferOwnershipRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[TransferOwnershipService, Depends(get_transfer_ownership_service)],
+) -> MemberResponse:
+    try:
+        result = service.transfer(
+            project_id=project_id, actor_id=account.user_id, username=payload.username
+        )
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except ProjectPermissionDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, "Solo el propietario puede transferir el proyecto"
+        ) from None
+    except InvalidNewOwnerError:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "El nuevo propietario indicado no es valido"
+        ) from None
+    except ProjectNameAlreadyExistsError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "El nuevo propietario ya tiene un proyecto con ese nombre; cambialo antes de transferir",
+        ) from None
+
+    return MemberResponse(
+        username=result.username, role=result.member.role, joined_at=result.member.joined_at
+    )

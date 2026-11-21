@@ -56,3 +56,9 @@ class UpdateProjectRequest(BaseModel):
         if value is None:
             raise ValueError("El nombre no puede ser nulo")
         return value
+
+
+class TransferOwnershipRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    username: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3)]
