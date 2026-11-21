@@ -44,6 +44,6 @@ class MemberProfile:
 
 
 @dataclass
-class MemberWithRole:
+class MemberWithUsername:
     member: ProjectMember
     username: str

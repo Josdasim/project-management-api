@@ -6,7 +6,7 @@ from src.modules.projects.application.interfaces.project_member_repository impor
     ProjectMemberRepository,
 )
 from src.modules.projects.application.interfaces.project_repository import ProjectRepository
-from src.modules.projects.domain.entities import MemberWithRole
+from src.modules.projects.domain.entities import MemberWithUsername
 from src.modules.projects.domain.enums import ProjectRole
 from src.modules.projects.domain.exceptions import (
     MemberNotFoundError,
@@ -30,7 +30,7 @@ class ChangeMemberRoleService:
 
     def change_role(
         self, *, project_id: UUID, actor_id: UUID, username: str, role: ProjectRole
-    ) -> MemberWithRole:
+    ) -> MemberWithUsername:
         actor = self._project.get_by_id_and_member(project_id, actor_id)
         if actor is None:
             raise ProjectNotFoundError
@@ -52,4 +52,4 @@ class ChangeMemberRoleService:
         target.role = role
         updated = self._member.update(target)
         self._unit_work.commit()
-        return MemberWithRole(member=updated, username=account.username)
+        return MemberWithUsername(member=updated, username=account.username)
