@@ -11,6 +11,7 @@ from src.modules.projects.application.services.create_project import CreateProje
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.leave_project import LeaveProjectService
+from src.modules.projects.application.services.list_deleted_projects import ListDeletedProjectsService
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
@@ -107,3 +108,9 @@ def get_transfer_ownership_service(
         account=SqlAlchemyAccountRepository(db),
         unit_work=db,
     )
+
+
+def get_list_deleted_projects_service(
+        db: Annotated[Session, Depends(get_db)]
+) -> ListDeletedProjectsService:
+    return ListDeletedProjectsService(project=SqlAlchemyProjectRepository(db))

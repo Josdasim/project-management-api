@@ -8,6 +8,7 @@ from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
 from src.modules.projects.application.services.get_project import GetProjectService
+from src.modules.projects.application.services.list_deleted_projects import ListDeletedProjectsService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.transfer_ownership import TransferOwnershipService
 from src.modules.projects.application.services.update_project import UpdateProjectService
@@ -20,6 +21,7 @@ from src.modules.projects.domain.exceptions import (
 from src.modules.projects.presentation.dependencies import (
     get_create_project_service,
     get_delete_project_service,
+    get_list_deleted_projects_service,
     get_list_projects_service,
     get_project_service,
     get_transfer_ownership_service,
@@ -28,6 +30,7 @@ from src.modules.projects.presentation.dependencies import (
 from src.modules.projects.presentation.v1.member_schemas import MemberResponse
 from src.modules.projects.presentation.v1.schemas import (
     CreateProjectRequest,
+    DeletedProjectItem,
     ProjectDetailResponse,
     ProjectListItem,
     ProjectListParams,
@@ -88,6 +91,34 @@ def list_projects(
         total=page.total,
         page=page.page,
         page_size=page.page_size,
+    )
+
+
+@router.get('/deleted', response_model=PageResponse[DeletedProjectItem])
+def list_deleted_projects(
+    params: Annotated[PaginationParams, Query()],
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ListDeletedProjectsService, Depends(get_list_deleted_projects_service)]
+) -> PageResponse[DeletedProjectItem]:
+    page = service.list_deleted(
+        user_id=account.user_id, page=params.page, page_size=params.page_size
+    )
+
+    return PageResponse[DeletedProjectItem](
+        items=[
+            DeletedProjectItem(
+                id=project.id,
+                name=project.name,
+                description=project.description,
+                status=project.status,
+                created_at=project.created_at,
+                deleted_at=project.deleted_at
+            )
+            for project in page.items
+        ],
+        total=page.total,
+        page=page.page,
+        page_size=page.page_size
     )
 
 
