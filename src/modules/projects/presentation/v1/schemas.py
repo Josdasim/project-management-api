@@ -62,3 +62,7 @@ class TransferOwnershipRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     username: Annotated[str, StringConstraints(strip_whitespace=True, min_length=3)]
+
+
+class DeletedProjectItem(ProjectResponse):
+    deleted_at: datetime

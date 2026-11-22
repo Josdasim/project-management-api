@@ -135,3 +135,29 @@ class SqlAlchemyProjectRepository:
                 raise ProjectNameAlreadyExistsError from error
             raise
         return _to_entity(model)
+
+    def _deleted_by_owner_statement(self, owner_id: UUID):
+        return select(ProjectModel).where(
+            ProjectModel.owner_id == owner_id, ProjectModel.deleted_at.is_not(None)
+        )
+
+    def get_by_id_and_owner(self, project_id: UUID, owner_id: UUID) -> Project | None:
+        model = self._session.scalar(
+            select(ProjectModel).where(
+                ProjectModel.id == project_id, ProjectModel.owner_id == owner_id
+            )
+        )
+        return _to_entity(model) if model else None
+
+    def list_deleted_by_owner(self, owner_id: UUID, *, limit: int, offset: int) -> list[Project]:
+        statement = (
+            self._deleted_by_owner_statement(owner_id)
+            .order_by(ProjectModel.deleted_at.desc(), ProjectModel.id.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        return [_to_entity(model) for model in self._session.scalars(statement)]
+
+    def count_deleted_by_owner(self, owner_id: UUID) -> int:
+        subquery = self._deleted_by_owner_statement(owner_id).subquery()
+        return self._session.scalar(select(func.count()).select_from(subquery)) or 0
