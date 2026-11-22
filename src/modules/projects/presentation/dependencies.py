@@ -9,6 +9,9 @@ from src.modules.projects.application.services.add_member import AddMemberServic
 from src.modules.projects.application.services.change_member_role import ChangeMemberRoleService
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
+from src.modules.projects.application.services.delete_project_permanently import (
+    DeleteProjectPermanentlyService,
+)
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.leave_project import LeaveProjectService
 from src.modules.projects.application.services.list_deleted_projects import (
@@ -116,3 +119,9 @@ def get_list_deleted_projects_service(
     db: Annotated[Session, Depends(get_db)],
 ) -> ListDeletedProjectsService:
     return ListDeletedProjectsService(project=SqlAlchemyProjectRepository(db))
+
+
+def get_delete_project_permanently_service(
+    db: Annotated[Session, Depends(get_db)],
+) -> DeleteProjectPermanentlyService:
+    return DeleteProjectPermanentlyService(project=SqlAlchemyProjectRepository(db), unit_work=db)

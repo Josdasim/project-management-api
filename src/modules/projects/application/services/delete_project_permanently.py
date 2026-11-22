@@ -11,6 +11,12 @@ class DeleteProjectPermanentlyService:
         self._unit_work = unit_work
 
     def delete_permanently(self, *, project_id: UUID, user_id: UUID) -> None:
-        self._project.lock(project_id)
+        project = self._project.get_by_id_and_owner(project_id, user_id)
 
-        project = self._project.get_by_id_and_member(project_id, user_id)
+        if project is None:
+            raise ProjectNotFoundError
+        if project.deleted_at is None:
+            raise ProjectNotDeletedError
+
+        self._project.delete(project_id)
+        self._unit_work.commit()
