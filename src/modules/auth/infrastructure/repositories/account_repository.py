@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from src.modules.auth.domain.entities import Account
+from src.modules.auth.domain.enums import AccountStatus
 from src.modules.auth.domain.exceptions import EmailAlreadyExistsError, UsernameAlreadyExistsError
 from src.modules.auth.infrastructure.models import Account as AccountModel
 
@@ -76,4 +77,9 @@ class SqlAlchemyAccountRepository:
     def update_password_hash(self, account_id: UUID, password_hash: str) -> None:
         model = self._session.get(AccountModel, account_id)
         model.password_hash = password_hash
+        self._session.flush()
+
+    def update_status(self, account_id: UUID, status: AccountStatus) -> None:
+        model = self._session.get(AccountModel, account_id)
+        model.status = status
         self._session.flush()

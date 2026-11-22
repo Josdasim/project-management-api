@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from src.modules.auth.application.services.change_password import ChangePasswordService
+from src.modules.auth.application.services.deactivate_account import DeactivateAccountService
 from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.application.services.logout import LogoutService
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
@@ -18,6 +19,7 @@ from src.modules.auth.domain.exceptions import (
 from src.modules.auth.presentation.dependencies import (
     get_change_password_service,
     get_current_account,
+    get_deactivate_account_service,
     get_login_service,
     get_logout_service,
     get_refresh_service,
@@ -26,6 +28,7 @@ from src.modules.auth.presentation.dependencies import (
 from src.modules.auth.presentation.v1.schemas import (
     AccountResponse,
     ChangePasswordRequest,
+    DeactivateAccountRequest,
     LoginRequest,
     LoginResponse,
     RefreshRequest,
@@ -130,4 +133,18 @@ def change_password(
     except InvalidCurrentPasswordError:
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, "La contraseña actual no es correcta"
+        ) from None
+
+
+@router.post("/deactivate", status_code=status.HTTP_204_NO_CONTENT)
+def deactivate_account(
+    payload: DeactivateAccountRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[DeactivateAccountService, Depends(get_deactivate_account_service)],
+) -> None:
+    try:
+        service.deactivate(account=account, current_password=payload.current_password)
+    except InvalidCurrentPasswordError:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "La contraseña ingresada no es correcta"
         ) from None
