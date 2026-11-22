@@ -161,3 +161,8 @@ class SqlAlchemyProjectRepository:
     def count_deleted_by_owner(self, owner_id: UUID) -> int:
         subquery = self._deleted_by_owner_statement(owner_id).subquery()
         return self._session.scalar(select(func.count()).select_from(subquery)) or 0
+
+    def delete(self, project_id: UUID) -> None:
+        model = self._session.get(ProjectModel, project_id)
+        self._session.delete(model)
+        self._session.flush()

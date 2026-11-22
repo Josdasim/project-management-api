@@ -7,6 +7,9 @@ from src.core.pagination import PageResponse, PaginationParams
 from src.modules.auth.public import Account, get_current_account
 from src.modules.projects.application.services.create_project import CreateProjectService
 from src.modules.projects.application.services.delete_project import DeleteProjectService
+from src.modules.projects.application.services.delete_project_permanently import (
+    DeleteProjectPermanentlyService,
+)
 from src.modules.projects.application.services.get_project import GetProjectService
 from src.modules.projects.application.services.list_deleted_projects import (
     ListDeletedProjectsService,
@@ -17,11 +20,13 @@ from src.modules.projects.application.services.update_project import UpdateProje
 from src.modules.projects.domain.exceptions import (
     InvalidNewOwnerError,
     ProjectNameAlreadyExistsError,
+    ProjectNotDeletedError,
     ProjectNotFoundError,
     ProjectPermissionDeniedError,
 )
 from src.modules.projects.presentation.dependencies import (
     get_create_project_service,
+    get_delete_project_permanently_service,
     get_delete_project_service,
     get_list_deleted_projects_service,
     get_list_projects_service,
@@ -226,3 +231,22 @@ def transfer_ownership(
     return MemberResponse(
         username=result.username, role=result.member.role, joined_at=result.member.joined_at
     )
+
+
+@router.delete("/{project_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project_permanently(
+    project_id: UUID,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[
+        DeleteProjectPermanentlyService, Depends(get_delete_project_permanently_service)
+    ],
+) -> None:
+    try:
+        service.delete_permanently(project_id=project_id, user_id=account.user_id)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except ProjectNotDeletedError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "Solo se puede eliminar permanentemente un proyecto que este en la papelera",
+        ) from None
