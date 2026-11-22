@@ -1,12 +1,8 @@
 from uuid import UUID
 
 from src.core.unit_of_work import UnitOfWork
-from src.modules.projects.application.interfaces.project_repository import (
-    ProjectRepository
-)
-from src.modules.projects.domain.exceptions import (
-    ProjectNotFoundError, ProjectNotDeletedError
-)
+from src.modules.projects.application.interfaces.project_repository import ProjectRepository
+from src.modules.projects.domain.exceptions import ProjectNotFoundError, ProjectNotDeletedError
 
 
 class DeleteProjectPermanentlyService:
