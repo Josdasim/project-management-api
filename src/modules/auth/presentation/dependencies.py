@@ -9,6 +9,7 @@ from src.core.database import get_db
 from src.core.security import ArgonPasswordHasher
 from src.modules.auth.application.services.authenticate import AuthenticateService
 from src.modules.auth.application.services.change_password import ChangePasswordService
+from src.modules.auth.application.services.deactivate_account import DeactivateAccountService
 from src.modules.auth.application.services.login import LoginService
 from src.modules.auth.application.services.logout import LogoutService
 from src.modules.auth.application.services.refresh_session import RefreshSessionService
@@ -100,6 +101,17 @@ def get_logout_service(db: Annotated[Session, Depends(get_db)]) -> LogoutService
 
 def get_change_password_service(db: Annotated[Session, Depends(get_db)]) -> ChangePasswordService:
     return ChangePasswordService(
+        account=SqlAlchemyAccountRepository(db),
+        refresh_token=SqlAlchemyRefreshTokenRepository(db),
+        hasher=ArgonPasswordHasher(),
+        unit_work=db,
+    )
+
+
+def get_deactivate_account_service(
+    db: Annotated[Session, Depends(get_db)],
+) -> DeactivateAccountService:
+    return DeactivateAccountService(
         account=SqlAlchemyAccountRepository(db),
         refresh_token=SqlAlchemyRefreshTokenRepository(db),
         hasher=ArgonPasswordHasher(),
