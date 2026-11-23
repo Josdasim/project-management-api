@@ -83,3 +83,17 @@ class SqlAlchemyAccountRepository:
         model = self._session.get(AccountModel, account_id)
         model.status = status
         self._session.flush()
+
+    def update_email(self, account_id: UUID, email: str) -> Account:
+        model = self._session.get(AccountModel, account_id)
+        model.email = email
+
+        try:
+            self._session.flush()
+        except IntegrityError as error:
+            constraint = getattr(error.orig.diag, "constraint_name", None) or ""
+
+            if "email" in constraint:
+                raise EmailAlreadyExistsError from error
+            raise
+        return _to_entity(model)

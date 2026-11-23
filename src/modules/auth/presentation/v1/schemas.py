@@ -2,7 +2,9 @@ from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints, field_validator
+from pydantic import (
+    BaseModel, ConfigDict, EmailStr, Field, StringConstraints, AfterValidator
+)
 
 from src.modules.auth.domain.enums import AccountStatus
 
@@ -15,6 +17,14 @@ NameStr = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=1, max_length=NAME_MAX)
 ]
 
+def _check_email_lenght(value: str) -> str:
+    if len(value) > EMAIL_MAX:
+        raise ValueError(f"El correo no puede superar {EMAIL_MAX} caracteres")
+    return value
+
+LimitedEmail = Annotated[
+    EmailStr, AfterValidator(_check_email_lenght)
+]
 
 class RegisterRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -22,17 +32,10 @@ class RegisterRequest(BaseModel):
     username: str = Field(
         min_length=USERNAME_MIN, max_length=USERNAME_MAX, pattern=r"^[A-Za-z0-9_.-]+$"
     )
-    email: EmailStr
+    email: LimitedEmail
     password: str = Field(min_length=PASSWORD_MIN, max_length=PASSWORD_MAX, repr=False)
     first_name: NameStr
     last_name: NameStr | None = None
-
-    @field_validator("email")
-    @classmethod
-    def email_not_too_long(cls, value: str) -> str:
-        if len(value) > EMAIL_MAX:
-            raise ValueError(f"El correo no puede superar {EMAIL_MAX} caracteres")
-        return value
 
 
 class RegisterResponse(BaseModel):
@@ -80,4 +83,11 @@ class ChangePasswordRequest(BaseModel):
 class DeactivateAccountRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    current_password: str = Field(min_length=1, max_length=PASSWORD_MAX, repr=False)
+
+
+class ChangeEmailRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    new_email: LimitedEmail
     current_password: str = Field(min_length=1, max_length=PASSWORD_MAX, repr=False)

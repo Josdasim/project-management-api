@@ -8,6 +8,7 @@ from src.core.config import settings
 from src.core.database import get_db
 from src.core.security import ArgonPasswordHasher
 from src.modules.auth.application.services.authenticate import AuthenticateService
+from src.modules.auth.application.services.change_email import ChangeEmailService
 from src.modules.auth.application.services.change_password import ChangePasswordService
 from src.modules.auth.application.services.deactivate_account import DeactivateAccountService
 from src.modules.auth.application.services.login import LoginService
@@ -116,4 +117,13 @@ def get_deactivate_account_service(
         refresh_token=SqlAlchemyRefreshTokenRepository(db),
         hasher=ArgonPasswordHasher(),
         unit_work=db,
+    )
+
+
+def get_change_email_service(
+        db: Annotated[Session, Depends(get_db)]
+) -> ChangeEmailService:
+    return ChangeEmailService(
+        account=SqlAlchemyAccountRepository(db), 
+        hasher=ArgonPasswordHasher(), unit_work=db
     )

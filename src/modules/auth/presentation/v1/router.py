@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.modules.auth.application.services.change_email import ChangeEmailService
 from src.modules.auth.application.services.change_password import ChangePasswordService
 from src.modules.auth.application.services.deactivate_account import DeactivateAccountService
 from src.modules.auth.application.services.login import LoginService
@@ -17,6 +18,7 @@ from src.modules.auth.domain.exceptions import (
     UsernameAlreadyExistsError,
 )
 from src.modules.auth.presentation.dependencies import (
+    get_change_email_service,
     get_change_password_service,
     get_current_account,
     get_deactivate_account_service,
@@ -27,6 +29,7 @@ from src.modules.auth.presentation.dependencies import (
 )
 from src.modules.auth.presentation.v1.schemas import (
     AccountResponse,
+    ChangeEmailRequest,
     ChangePasswordRequest,
     DeactivateAccountRequest,
     LoginRequest,
@@ -148,3 +151,32 @@ def deactivate_account(
         raise HTTPException(
             status.HTTP_422_UNPROCESSABLE_CONTENT, "La contraseña ingresada no es correcta"
         ) from None
+
+
+@router.patch("/email", response_model=AccountResponse)
+def change_email(
+    payload: ChangeEmailRequest,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[ChangeEmailService, Depends(get_change_email_service)],
+) -> AccountResponse:
+    try:
+        updated = service.change_email(
+            account=account,
+            current_password=payload.current_password,
+            new_email=payload.new_email,
+        )
+    except InvalidCurrentPasswordError:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT, "La contraseña actual no es correcta"
+        ) from None
+    except EmailAlreadyExistsError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "El correo electronico ya esta registrado"
+        ) from None
+
+    return AccountResponse(
+        username=updated.username,
+        email=updated.email,
+        status=updated.status,
+        created_at=updated.created_at,
+    )
