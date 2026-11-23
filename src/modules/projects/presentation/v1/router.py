@@ -15,6 +15,7 @@ from src.modules.projects.application.services.list_deleted_projects import (
     ListDeletedProjectsService,
 )
 from src.modules.projects.application.services.list_projects import ListProjectsService
+from src.modules.projects.application.services.restore_project import RestoreProjectService
 from src.modules.projects.application.services.transfer_ownership import TransferOwnershipService
 from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.domain.exceptions import (
@@ -31,6 +32,7 @@ from src.modules.projects.presentation.dependencies import (
     get_list_deleted_projects_service,
     get_list_projects_service,
     get_project_service,
+    get_restore_project_service,
     get_transfer_ownership_service,
     get_update_project_service,
 )
@@ -126,6 +128,29 @@ def list_deleted_projects(
         total=page.total,
         page=page.page,
         page_size=page.page_size,
+    )
+
+
+@router.post("/{project_id}/restore", response_model=ProjectDetailResponse)
+def restore_project(
+    project_id: UUID,
+    account: Annotated[Account, Depends(get_current_account)],
+    service: Annotated[RestoreProjectService, Depends(get_restore_project_service)],
+) -> ProjectDetailResponse:
+    try:
+        restored = service.restore(project_id=project_id, user_id=account.user_id)
+    except ProjectNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Proyecto no encontrado") from None
+    except ProjectNotDeletedError:
+        raise HTTPException(status.HTTP_409_CONFLICT, "El proyecto no esta eliminado") from None
+
+    return ProjectDetailResponse(
+        id=restored.project.id,
+        name=restored.project.name,
+        description=restored.project.description,
+        status=restored.project.status,
+        created_at=restored.project.created_at,
+        role=restored.role,
     )
 
 

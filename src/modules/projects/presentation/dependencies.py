@@ -20,6 +20,7 @@ from src.modules.projects.application.services.list_deleted_projects import (
 from src.modules.projects.application.services.list_members import ListMembersService
 from src.modules.projects.application.services.list_projects import ListProjectsService
 from src.modules.projects.application.services.remove_member import RemoveMemberService
+from src.modules.projects.application.services.restore_project import RestoreProjectService
 from src.modules.projects.application.services.transfer_ownership import TransferOwnershipService
 from src.modules.projects.application.services.update_project import UpdateProjectService
 from src.modules.projects.infrastructure.repositories.project_member_repository import (
@@ -125,3 +126,7 @@ def get_delete_project_permanently_service(
     db: Annotated[Session, Depends(get_db)],
 ) -> DeleteProjectPermanentlyService:
     return DeleteProjectPermanentlyService(project=SqlAlchemyProjectRepository(db), unit_work=db)
+
+
+def get_restore_project_service(db: Annotated[Session, Depends(get_db)]) -> RestoreProjectService:
+    return RestoreProjectService(project=SqlAlchemyProjectRepository(db), unit_work=db)
