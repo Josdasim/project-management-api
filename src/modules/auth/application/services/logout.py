@@ -16,8 +16,8 @@ class LogoutService:
         self._token_provider = token_provider
         self._unit_work = unit_work
 
-    def logout(self, genereted_refresh_token: str) -> None:
-        token_hash = self._token_provider.hash_refresh_token(genereted_refresh_token)
+    def logout(self, generated_refresh_token: str) -> None:
+        token_hash = self._token_provider.hash_refresh_token(generated_refresh_token)
         stored = self._refresh_token.get_by_hash(token_hash)
 
         if stored is None or stored.revoked_at is not None:

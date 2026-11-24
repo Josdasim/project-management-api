@@ -54,7 +54,7 @@ class LoginService:
                 id=uuid.uuid7(),
                 account_id=account.id,
                 token_hash=self._token_provider.hash_refresh_token(generated_refresh_token),
-                expires_at=datetime.now() + timedelta(days=self._refresh_days),
+                expires_at=datetime.now(UTC) + timedelta(days=self._refresh_days),
             )
         )
         self._unit_work.commit()
