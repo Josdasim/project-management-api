@@ -56,9 +56,13 @@ def register(
             last_name=payload.last_name,
         )
     except UsernameAlreadyExistsError:
-        raise HTTPException(status.HTTP_409_CONFLICT, "El nombre de usuario ya esta registrado")
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "El nombre de usuario ya esta registrado"
+            ) from None
     except EmailAlreadyExistsError:
-        raise HTTPException(status.HTTP_409_CONFLICT, "El correo electronico ya esta registrado")
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "El correo electronico ya esta registrado"
+            ) from None
 
     return RegisterResponse(
         username=result.account.username,
@@ -118,7 +122,7 @@ def refresh(
 def logout(
     payload: RefreshRequest, service: Annotated[LogoutService, Depends(get_logout_service)]
 ) -> None:
-    service.logout(genereted_refresh_token=payload.refresh_token)
+    service.logout(generated_refresh_token=payload.refresh_token)
 
 
 @router.put("/password", status_code=status.HTTP_204_NO_CONTENT)

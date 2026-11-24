@@ -59,17 +59,7 @@ def test_eliminar_las_membresias_y_las_tareas_del_proyecto(
     client, access_token, other_token, db, project
 ):
     add_member(db, "Mi Proyecto", "otro_username", ProjectRole.MEMBER)
-    retired = (
-        add_member(
-            db,
-            "Mi Proyecto",
-            "tercer_user",
-            ProjectRole.VIEWER,
-            left_at=__import__("datetime").datetime.now(__import__("datetime").UTC),
-        )
-        if False
-        else None
-    )
+    
     new_task(client, access_token, project["id"], title="Tarea 1", assigned_to="otro_username")
     new_task(client, access_token, project["id"], title="Tarea 2")
     assert count(db, ProjectMemberModel, project["id"]) == 2
